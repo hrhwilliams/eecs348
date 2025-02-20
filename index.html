@@ -1,0 +1,86 @@
+<html lang="en-US">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <link href="style.css" rel="stylesheet" type="text/css">
+  <title>Harlan Williams's Page</title>
+</head>
+<body>
+  <h1>EECS 348 Labs</h1>
+  <h2>Lab 1</h2>
+  <p>
+    <a href="slides/lab1.pdf">Slides</a>. Git and GitHub. Learn how to
+    create a git repository, add files to it, modify tracked files, and
+    push the repository to GitHub.
+  </p>
+
+  <p>
+    See
+    <a href="https://medium.com/code-factory-berlin/github-repository-structure-best-practices-248e6effc405">
+    https://medium.com/code-factory-berlin/github-repository-structure-best-practices-248e6effc405</a>
+    for some best practices for organizing your repositories.
+  </p>
+
+  <h2>Lab 2</h2>
+  <p>
+    <a href="slides/lab2.pdf">Slides</a>. Regular expressions and common
+    Unix command-line tools. Learn how to write regular expressions, use
+    them in tools such as grep, sed, and awk, and how to pipeline commands
+    together.
+  </p>
+
+  <h2>Lab 3</h2>
+  <p>
+    <a href="slides/lab3.pdf">Slides</a>. How to compile a C program with multiple source code files using Make.
+  </p>
+  <h3>Live-coding examples</h3>
+  <h4>main.c</h4>
+  <p><code>main.c</code> Contains a function named <code>main</code>. Every C program requires one such function as an entry-point into the program. The third line includes the <code>even.h</code> header file with the definition for <code>is_even</code>.
+<pre class="code">
+<code>#include &ltstdio.h&gt</code>
+<code></code>
+<code>#include "even.h"</code>
+<code></code>
+<code>int main() {</code>
+<code>  int n = 5;</code>
+<code></code>
+<code>  if (is_even(n)) {</code>
+<code>    printf("%d is even\n", n);</code>
+<code>  } else {</code>
+<code>    printf("%d is odd\n", n);</code>
+<code>  }</code>
+<code>}</code>
+</code></pre>
+<h4>even.c</h4>
+<pre class="code">
+<code>#include "even.h"</code>
+<code></code>
+<code>int is_even(int n) {</code>
+<code>  if (n % 2 == 0) {</code>
+<code>    return 1;</code>
+<code>  } else {</code>
+<code>    return 0;</code>
+<code>  }</code>
+<code>}</code>
+</pre>
+<h4>even.h</h4>
+<pre class="code">
+<code>#ifndef __EVEN_H__</code>
+<code>#define __EVEN_H__</code>
+<code></code>
+<code>int is_even(int n);</code>
+<code></code>
+<code>#endif /* __EVEN_H__ */</code>
+</pre>
+<h4>Sequence of commands to create an executable</h4>
+<p>To compile the two .c files into an executable, I ran this sequence of commands to create the file <code>program</code> which can then be run with: <code>$ ./program</code>.</p>
+<code><pre>gcc even.c -c         # -c compiles a .o object
+gcc main.c -c
+gcc main.o even.o -o program  # -o compiles an executable
+</code></pre>
+  <h2>Lab 4</h2>
+  <p>
+    <a href="slides/lab4.pdf">Slides</a>. Introduction to web programming with HTML, CSS, JavaScript, and PHP.
+  </p>
+</body>
+</html>
