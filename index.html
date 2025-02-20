@@ -85,32 +85,50 @@ gcc main.o even.o -o program  # -o compiles an executable
   </p>
   <h3>Uploading your website</h3>
   <p>To put your website on your people page&mdash;<em>e.g.</em>, mine is
-  <a href="https://people.eecs.ku.edu/~h054w684">https://people.eecs.ku.edu/~h054w684</a> and yours
+  <a href="https://people.eecs.ku.edu/~h054w684">https://people.eecs.ku.edu/~h054w684</a> and for yours, you
   will replace the <code>h054w684</code> part of the URL with your first-initial last-initial
-  ID&mdash;you will have to connect to the cycle servers, or get on a lab machine. From there, under
-  your home directory you should have a directory named <code>public_html</code>. All of the source
-  code for your website must be placed in there to be visible. You should have a file named
-  <code>index.html</code>, which will be the first HTML page that is displayed when you navigate to
-  your URL. From there, you should link to the other practice pages.</p>
+  ID&mdash;you will have to connect to the cycle servers with SSH, or get on a lab machine. See the slides for
+  this lab for help with using SSH, and the slides for labs 2 and 3 for some terminal commands to help you navigate
+  on the server.</p>
+  
+  <p>Once you are logged onto the cycle server, under your home directory you should have a directory named <code>public_html</code>.
+  All of the source code for your website must be placed in there to be visible at your URL. You will need to create a file named
+  <code>index.html</code> in that directory, which will be the first HTML page that is displayed when
+  you navigate to your URL. From there, you should link to the other practice pages you make for the lab.</p>
+
+  <p>To actually display your website, you will need to set up some permissions for the cycle server.
+  Another one of the TAs has prepared a script to do this for you. On the cycle server, run the
+  commands:</p>
+
+  <pre>
+  <code>$ wget people.eecs.ku.edu/~l367r860/grant_permission.sh</code>
+  <code>$ bash grant_permission.sh</code>
+  </pre>
+
+  <p>These will download a script and execute it, setting up all of the permissions the server needs to see your
+  source code and display it on your page. If you navigate to your page, you should see the output of your <code>index.html</code>
+  file in the browser if you have everything set up correctly.</p>
 
   <h3>Using GitHub to sync your code and your website</h3>
   <p>The lab submission wants you to provide a link to a GitHub repository with your website's source
   code, as well as a link to your people website. A good workflow for this assignment would be to develop your
   website on your local machine in a git repository that you push to GitHub, and to clone that repository
   on the cycle server in the <code>public_html</code> directory to keep your code synced up.
-  For help with the first step of putting your code on GitHub, review the slides for Lab 1.</p>
+  For help with the first step of putting your code on GitHub, review the slides for lab 1.</p>
 
-  <p>For the step of cloning your repository on your lab machine, the way I found that works best is to 
-  rename your <code>public_html</code> directory on the cycle server by running:</p>
+  <p>For the step of cloning your repository on your lab machine after you have created it on GitHub,
+  navigate into the <code>public_html</code> directory on the cycle server and run:</p>
 
-  <code><pre>$ mv public_html public_html2</pre></code>
+  <pre>
+    <code>$ git init -b main</code>
+    <code>$ git remote add origin &lt;YOUR REPOSITORY URL&gt;</code>
+    <code>$ git pull origin main</code>
+    <code>$ git branch --set-upstream-to=origin/main main</code>
+  </pre>
 
-  <p>This ensures that if you mess something up, you can recover the original folder. Next, assuming
-  you have already created your git repository, you can now clone it on the lab machine, but you will
-  need the folder the repository is cloned into to be named <code>public_html</code>. You can set the
-  name of the folder that git clones into with:</p>
-
-  <code><pre>$ git clone &ltYOUR REPOSITORY URL&gt public_html</pre></code>
+  <p>This will pull in all of the files from your repository on GitHub. From there, whenever you do a push from
+  your local machine and want to update your page, you can SSH onto the cycle server, navigate to <code>public_html</code>,
+  and run <code>$ git pull</code> to pull your changes from GitHub.</p>
 
   <p>Now you have git repositories on both your local machine and the cycle server, and you will be able
   to develop locally, push changes to GitHub, and later connect to the cycle machine to pull those changes
