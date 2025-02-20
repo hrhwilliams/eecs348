@@ -80,7 +80,40 @@ gcc main.o even.o -o program  # -o compiles an executable
 </code></pre>
   <h2>Lab 4</h2>
   <p>
-    <a href="slides/lab4.pdf">Slides</a>. Introduction to web programming with HTML, CSS, JavaScript, and PHP.
+    <a href="slides/lab4.pdf">Slides</a>. Connecting to the cycle machines using SSH. 
+    Introduction to web programming with HTML, CSS, JavaScript, and PHP.
   </p>
+  <h3>Uploading your website</h3>
+  <p>To put your website on your people page&mdash;<em>e.g.</em>, mine is
+  <a href="https://people.eecs.ku.edu/~h054w684">https://people.eecs.ku.edu/~h054w684</a> and yours
+  will replace the <code>h054w684</code> part of the URL with your first-initial last-initial
+  ID&mdash;you will have to connect to the cycle servers, or get on a lab machine. From there, under
+  your home directory you should have a directory named <code>public_html</code>. All of the source
+  code for your website must be placed in there to be visible. You should have a file named
+  <code>index.html</code>, which will be the first HTML page that is displayed when you navigate to
+  your URL. From there, you should link to the other practice pages.</p>
+
+  <h3>Using GitHub to sync your code and your website</h3>
+  <p>The lab submission wants you to provide a link to a GitHub repository with your website's source
+  code, as well as a link to your people website. A good workflow for this assignment would be to develop your
+  website on your local machine in a git repository that you push to GitHub, and to clone that repository
+  on the cycle server in the <code>public_html</code> directory to keep your code synced up.
+  For help with the first step of putting your code on GitHub, review the slides for Lab 1.</p>
+
+  <p>For the step of cloning your repository on your lab machine, the way I found that works best is to 
+  rename your <code>public_html</code> directory on the cycle server by running:</p>
+
+  <code><pre>$ mv public_html public_html2</pre></code>
+
+  <p>This ensures that if you mess something up, you can recover the original folder. Next, assuming
+  you have already created your git repository, you can now clone it on the lab machine, but you will
+  need the folder the repository is cloned into to be named <code>public_html</code>. You can set the
+  name of the folder that git clones into with:</p>
+
+  <code><pre>$ git clone &ltYOUR REPOSITORY URL&gt public_html</pre></code>
+
+  <p>Now you have git repositories on both your local machine and the cycle server, and you will be able
+  to develop locally, push changes to GitHub, and later connect to the cycle machine to pull those changes
+  to have them actually be reflected on your people page.</p>
 </body>
 </html>
