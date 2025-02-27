@@ -1,0 +1,79 @@
+<html lang="en-US">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="style.css" rel="stylesheet" type="text/css">
+  <title>Harlan Williams's Page</title>
+</head>
+<body>
+  <header>
+    <h1>EECS 348 Labs</h1>
+    <ul>
+      <li><a href="index.html">Index</a></li>
+      <li><a href="lab1.html">Lab 1&mdash;Git and GitHub</a></li>
+      <li><a href="lab2.html">Lab 2&mdash;Regular expressions</a></li>
+      <li><a href="lab3.html">Lab 3&mdash;Makefiles</a></li>
+      <li><a href="lab4.html">Lab 4&mdash;Web programming</a></li>
+      <li><a href="lab5.html">Lab 5&mdash;UML use cases</a></li>
+    </ul>
+  </header>
+  <main>
+    <h1>Lab 4 &mdash; Web programming</h1>
+    <p>
+      <a href="slides/lab4.pdf">Slides</a>. Connecting to the cycle machines using SSH. 
+      Introduction to web programming with HTML, CSS, JavaScript, and PHP.
+    </p>
+    <h2>Uploading your website</h2>
+    <p>To put your website on your people page&mdash;<em>e.g.</em>, mine is
+    <a href="https://people.eecs.ku.edu/~h054w684">https://people.eecs.ku.edu/~h054w684</a> and for yours, you
+    will replace the <code>h054w684</code> part of the URL with your first-initial last-initial
+    ID&mdash;you will have to connect to the cycle servers with SSH, or get on a lab machine. See the slides for
+    this lab for help with using SSH, and the slides for labs 2 and 3 for some terminal commands to help you navigate
+    on the server.</p>
+    
+    <p>Once you are logged onto the cycle server, under your home directory you should have a directory named <code>public_html</code>.
+    All of the source code for your website must be placed in there to be visible at your URL. You will need to create a file named
+    <code>index.html</code> in that directory, which will be the first HTML page that is displayed when
+    you navigate to your URL. From there, you should link to the other practice pages you make for the lab.</p>
+  
+    <p>To actually display your website, you will need to set up some permissions for the cycle server.
+    Another one of the TAs has prepared a script to do this for you. On the cycle server, run the
+    commands:</p>
+  
+    <pre>
+    <code>$ wget people.eecs.ku.edu/~l367r860/grant_permission.sh</code>
+    <code>$ bash grant_permission.sh</code>
+    </pre>
+  
+    <p>These will download a script and execute it, setting up all of the permissions the server needs to see your
+    source code and display it on your page. If you navigate to your page, you should see the output of your <code>index.html</code>
+    file in the browser if you have everything set up correctly.</p>
+  
+    <h3>Using GitHub to sync your code and your website</h3>
+    <p>The lab submission wants you to provide a link to a GitHub repository with your website's source
+    code, as well as a link to your people website. A good workflow for this assignment would be to develop your
+    website on your local machine in a git repository that you push to GitHub, and to clone that repository
+    on the cycle server in the <code>public_html</code> directory to keep your code synced up.
+    For help with the first step of putting your code on GitHub, review the slides for lab 1.</p>
+  
+    <p>For the step of cloning your repository on your lab machine after you have created it on GitHub,
+    navigate into the <code>public_html</code> directory on the cycle server and run:</p>
+  
+    <pre>
+      <code>$ git init -b main</code>
+      <code>$ git remote add origin &lt;YOUR REPOSITORY URL&gt;</code>
+      <code>$ git pull origin main</code>
+      <code>$ git branch --set-upstream-to=origin/main main</code>
+    </pre>
+  
+    <p>This will pull in all of the files from your repository on GitHub. From there, whenever you do a push from
+    your local machine and want to update your page, you can SSH onto the cycle server, navigate to <code>public_html</code>,
+    and run <code>$ git pull</code> to pull your changes from GitHub.</p>
+  
+    <p>Now you have git repositories on both your local machine and the cycle server, and you will be able
+    to develop locally, push changes to GitHub, and later connect to the cycle machine to pull those changes
+    to have them actually be reflected on your people page.</p>
+  </main>
+</body>
+</html>
