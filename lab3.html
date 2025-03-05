@@ -16,6 +16,7 @@
       <li><a href="lab3.html">Lab 3&mdash;Makefiles</a></li>
       <li><a href="lab4.html">Lab 4&mdash;Web programming</a></li>
       <li><a href="lab5.html">Lab 5&mdash;UML use cases</a></li>
+      <li><a href="lab6.html">Lab 6&mdash;UML class diagrams</a></li>
     </ul>
   </header>
   <main>
@@ -26,49 +27,49 @@
     <h2>Live-coding examples</h2>
     <h4>main.c</h4>
     <p><code>main.c</code> Contains a function named <code>main</code>. Every C program requires one such function as an entry-point into the program. The third line includes the <code>even.h</code> header file with the definition for <code>is_even</code>.
-  <pre class="code">
-  <code>#include &ltstdio.h&gt</code>
-  <code></code>
-  <code>#include "even.h"</code>
-  <code></code>
-  <code>int main() {</code>
-  <code>  int n = 5;</code>
-  <code></code>
-  <code>  if (is_even(n)) {</code>
-  <code>    printf("%d is even\n", n);</code>
-  <code>  } else {</code>
-  <code>    printf("%d is odd\n", n);</code>
-  <code>  }</code>
-  <code>}</code>
-  </code></pre>
-  <h4>even.c</h4>
-  <pre class="code">
-  <code>#include "even.h"</code>
-  <code></code>
-  <code>int is_even(int n) {</code>
-  <code>  if (n % 2 == 0) {</code>
-  <code>    return 1;</code>
-  <code>  } else {</code>
-  <code>    return 0;</code>
-  <code>  }</code>
-  <code>}</code>
-  </pre>
-  <h4>even.h</h4>
-  <pre class="code">
-  <code>#ifndef __EVEN_H__</code>
-  <code>#define __EVEN_H__</code>
-  <code></code>
-  <code>int is_even(int n);</code>
-  <code></code>
-  <code>#endif /* __EVEN_H__ */</code>
-  </pre>
-  <h4>Sequence of commands to create an executable</h4>
-  <p>To compile the two .c files into an executable, I ran this sequence of commands to create the file <code>program</code> which can then be run with: <code>$ ./program</code>.</p>
-  <pre>
-  <code>gcc even.c -c                 # -c compiles a .o object</code>
-  <code>gcc main.c -c</code>
-  <code>gcc main.o even.o -o program  # -o compiles an executable</code>
-  </pre>
+    <pre class="code">
+      <code>#include &ltstdio.h&gt</code>
+      <code></code>
+      <code>#include "even.h"</code>
+      <code></code>
+      <code>int main() {</code>
+      <code>  int n = 5;</code>
+      <code></code>
+      <code>  if (is_even(n)) {</code>
+      <code>    printf("%d is even\n", n);</code>
+      <code>  } else {</code>
+      <code>    printf("%d is odd\n", n);</code>
+      <code>  }</code>
+      <code>}</code>
+    </code></pre>
+    <h4>even.c</h4>
+    <pre class="code">
+      <code>#include "even.h"</code>
+      <code></code>
+      <code>int is_even(int n) {</code>
+      <code>  if (n % 2 == 0) {</code>
+      <code>    return 1;</code>
+      <code>  } else {</code>
+      <code>    return 0;</code>
+      <code>  }</code>
+      <code>}</code>
+    </pre>
+    <h4>even.h</h4>
+    <pre class="code">
+      <code>#ifndef __EVEN_H__</code>
+      <code>#define __EVEN_H__</code>
+      <code></code>
+      <code>int is_even(int n);</code>
+      <code></code>
+      <code>#endif /* __EVEN_H__ */</code>
+    </pre>
+    <h4>Sequence of commands to create an executable</h4>
+    <p>To compile the two .c files into an executable, I ran this sequence of commands to create the file <code>program</code> which can then be run with: <code>$ ./program</code>.</p>
+    <pre>
+      <code>gcc even.c -c                 # -c compiles a .o object</code>
+      <code>gcc main.c -c</code>
+      <code>gcc main.o even.o -o program  # -o compiles an executable</code>
+    </pre>
   </main>
 </body>
 </html>
