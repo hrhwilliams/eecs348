@@ -85,11 +85,12 @@ int is_even(int n);
       This makefile runs the equivalent of the commands above to compile <code>main.c</code> and <code>even.c</code> together into an executable.
     </p>
     <pre>
-<code class="language-makefile"># set the compiler
+<code class="language-makefile"># set the compiler and compiler flags
 CC := gcc
-CFLAGS := -Wall
+CFLAGS := -Wall # -Wall means turn on all warnings
 
 # compile prog from a list of object files
+# if you have different source files, rename these
 prog: main.o even.o
 	$(CC) $(CFLAGS) $^ -o $@
 
