@@ -26,7 +26,11 @@
     </p>
     <h2>Live-coding examples</h2>
     <h4>main.c</h4>
-    <p><code>main.c</code> Contains a function named <code>main</code>. Every C program requires one such function as an entry-point into the program. The third line includes the <code>even.h</code> header file with the definition for <code>is_even</code>.
+    <p>
+      <code>main.c</code> is a C source code file that contains a function named <code>main</code>. Every C program requires one such function as an entry-point into the program.
+      The third line includes the <code>even.h</code> header file with the definition for <code>is_even</code>. Header files are required to expose
+      functions defined in one source file to other source files. In this example, including <code>even.h</code> in <code>main.c</code> makes the function
+      <code>is_even</code> usable there, even though it is defined in <code>even.c</code>.
     <pre class="code">
       <code>#include &ltstdio.h&gt</code>
       <code></code>
@@ -55,6 +59,7 @@
       <code>}</code>
     </pre>
     <h4>even.h</h4>
+    <p>The first two lines and the last line are preprocessor directives that protect against the header being included multiple times in one file. <code>#include</code> is very simplistic: it just copies the contents of one file into another during compilation.</p>
     <pre class="code">
       <code>#ifndef __EVEN_H__</code>
       <code>#define __EVEN_H__</code>
@@ -64,11 +69,11 @@
       <code>#endif /* __EVEN_H__ */</code>
     </pre>
     <h4>Sequence of commands to create an executable</h4>
-    <p>To compile the two .c files into an executable, I ran this sequence of commands to create the file <code>program</code> which can then be run with: <code>$ ./program</code>.</p>
+    <p>To compile the two .c files into an executable, I ran this sequence of commands to create the file <code>program</code> which can then be run with: <code>$ ./program</code>. The <code>$</code> at the start of each line means that what follows is shell input, and if you're running this for yourself you wouldn't write the <code>$</code>.</p>
     <pre>
-      <code>gcc even.c -c                 # -c compiles a .o object</code>
-      <code>gcc main.c -c</code>
-      <code>gcc main.o even.o -o program  # -o compiles an executable</code>
+      <code>$ gcc even.c -c                 # -c compiles a .o object</code>
+      <code>$ gcc main.c -c</code>
+      <code>$ gcc main.o even.o -o program  # -o compiles an executable</code>
     </pre>
   </main>
 </body>
