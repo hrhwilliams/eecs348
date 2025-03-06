@@ -30,24 +30,84 @@
   <main>
     <h1>Lab 6 &mdash; UML class diagrams</h1>
     <p>
-      <a href="slides/lab6.pdf">Slides</a>. Creating UML class diagrams to show the structure of an object-oriented program. Some advice for Assignment 4.
+      <a href="slides/lab6.pdf">Slides</a>. Creating UML class diagrams to show the structure of an object-oriented program.
     </p>
     <h2>Assignment 4</h2>
+    <h3>Handling data in C</h3>
     <p>
-      The following should hopefully help get you started with assignment 4 by explaining how to do some more complicated things in C.
+      C doesn't come with any built-in data structures, such as lists or dictionaries, like Python does. Instead if we want the
+      functionality of one of these from Python we'll have to build it ourselves. At the start, all C gives us to work with are
+      basic types such as: <code>int</code>, <code>char</code> and <code>float</code>; pointers; structs; and static arrays. If
+      we want a complex data type with multiple values, like a class with member variables, we can create a struct. The biggest
+      difference is here we can't associate member functions with structs like we can with classes in Python.
     </p>
-    <h3>Reading strings</h3>
+    <pre>
+      <code class="language-c">struct Data {
+    char *name;
+    int length;
+    float direction;
+};
+
+/* create one of our structs and set values inside it with the `.` operator */
+struct Data my_data;
+my_data.name = "Hello";
+my_data.length = 5;
+my_data.direction = 3.1415f;</code>
+    </pre>
     <p>
+      We can also create a static, fixed-size array of structs like this:
+    </p>
+    <pre>
+      <code class="language-c">struct Data my_array[16];
+my_array[0] = my_data; /* copy the values of `my_data` into the first element */
+my_array[1].name = "World"; /* modify the second element in-place */
+my_array[1].length = 5;
+      </code>
+    </pre>
+    <p>
+      Unlike in Python, we cannot grow or shrink this array, but we can mimic that behavior by starting with a large array and keeping an index to the last
+      element we've modified. Because the array and its length are associated we bundle them together in a struct:
+    </p>
+    <pre>
+      <code class="language-c">struct Array {
+    struct Data array[64];
+    int length;
+};</code>
+    </pre>
+    <p>
+      Then it would be a good idea to define how the array is used in a function, so that we don't have to manually adjust the <code>length</code>.
+    </p>
+      <pre>
+        <code class="language-c">void insert_array(struct Array *array, struct Data data) {
+    if (array->length == 64) {
+        /* handle the case where we've overfilled the array */
+    } else {
+        int index = array->length;
+        array->array[index] = data;
+        array->length += 1;
+    }
+}</code>
+      </pre>
+      <p>
+        Notice how here I pass the array as a pointer, because I want to modify the specific array. Otherwise this would create a new array in the function
+        and not modify it outside of the function like I want. I also use the arrow operator <code>-></code> rather than the dot operator to access member
+        variables of <code>array</code> through the pointer.
+      </p>
+      <h3>Reading strings</h3>
+      <p>
       To read input from a file in C, we can use the <code>fread</code> function. By the way, for all of the functions mentioned here, if you are on Linux or macOS
       you can type the command <code>man &lt;function&gt;</code> into your terminal to get a help page about that specific function. We can grab the first line of
       our input with the following code:
     </p>
       <pre>
         <code class="language-c">char buffer[512];
-FILE *fp = fopen("input.txt", "r"); /* "r" here means: open the file in read mode */
 
-char *line = fgets(buffer, sizeof buffer, fp); /* fgets will read up to the first newline or
-                                                * the end of the file, whichever comes first */</code>
+/* "r" here means: open the file in read mode */
+FILE *fp = fopen("input.txt", "r"); 
+
+/* fgets will read up to the first newline or *
+ * the end of the file, whichever comes first */
+char *line = fgets(buffer, sizeof buffer, fp);</code>
       </pre>
     <p>
       Here we allocate an array of characters for the text to be read into, named creatively <code>buffer</code>. We make it 512 characters long, which should be
@@ -65,14 +125,14 @@ char *line = fgets(buffer, sizeof buffer, fp); /* fgets will read up to the firs
 FILE *fp = fopen(filename, "r");
 char *line = fgets(buffer, sizeof buffer, fp);
 
-while (line != NULL) { /* make sure there even is another line */
+while (line != NULL) { /* check if we're done reading */
     process_line(line);
     line = fgets(buffer, sizeof buffer, fp) /* get the next input line */
 }</code>
     </pre>
     <p>
-      Here we use a while-loop to continuously grab lines and pass them to the function <code>process_input</code>. For instance, if process_input
-      just called <code>printf</code> on the line, this code would print the input file out to the terminal. This should be enough to read the input, just keep
+      Here we use a while-loop. We check if <code>line</code> is <code>NULL</code>
+      in each iteration, and if not, we pass it along to <code>process_input</code> and grab the next line. This should be enough to read the input, just keep
       in mind that each line will have a newline character at the end.
     </p>
     <h3>Parsing strings</h3>
@@ -83,8 +143,8 @@ while (line != NULL) { /* make sure there even is another line */
       To do this with <code class="language-c">strtok</code>, we do:
     </p>
     <pre>
-      <code class="language-c">/* Small technicality: strtok can't modify a constant string, so we create a new string with strdup.
- * In your own code, this won't be an issue because you won't be hard-coding the input, right? */
+      <code class="language-c">/* Small technicality: strtok can't modify a hard-coded string,
+ * so we create one it can modify with strdup. */
 const char *line = "Peer,Can you help me on this?,12-01-2024";
 char *input = strdup(line);
 
