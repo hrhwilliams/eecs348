@@ -1,10 +1,16 @@
 <html lang="en-US">
 <head>
+  <title>Harlan Williams's Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link href="style.css" rel="stylesheet" type="text/css">
-  <title>Harlan Williams's Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/makefile.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </head>
 <body>
   <header>
@@ -31,49 +37,73 @@
       The third line includes the <code>even.h</code> header file with the definition for <code>is_even</code>. Header files are required to expose
       functions defined in one source file to other source files. In this example, including <code>even.h</code> in <code>main.c</code> makes the function
       <code>is_even</code> usable there, even though it is defined in <code>even.c</code>.
-    <pre class="code">
-      <code>#include &ltstdio.h&gt</code>
-      <code></code>
-      <code>#include "even.h"</code>
-      <code></code>
-      <code>int main() {</code>
-      <code>  int n = 5;</code>
-      <code></code>
-      <code>  if (is_even(n)) {</code>
-      <code>    printf("%d is even\n", n);</code>
-      <code>  } else {</code>
-      <code>    printf("%d is odd\n", n);</code>
-      <code>  }</code>
-      <code>}</code>
+    <pre class="language-c">
+      <code>#include &lt;stdio.h&gt;
+#include "even.h"
+
+int main() {
+    int n = 5;
+
+    if (is_even(n)) {
+        printf("%d is even\n", n);
+    } else {
+        printf("%d is odd\n", n);   
+    }     
+}        
     </code></pre>
     <h4>even.c</h4>
-    <pre class="code">
-      <code>#include "even.h"</code>
-      <code></code>
-      <code>int is_even(int n) {</code>
-      <code>  if (n % 2 == 0) {</code>
-      <code>    return 1;</code>
-      <code>  } else {</code>
-      <code>    return 0;</code>
-      <code>  }</code>
-      <code>}</code>
+    <pre class="language-c">
+<code>#include "even.h"
+
+int is_even(int n) {
+    if (n % 2 == 0) {
+        return 1;
+    } else {
+        return 0;   
+    }     
+}</code>
     </pre>
     <h4>even.h</h4>
     <p>The first two lines and the last line are preprocessor directives that protect against the header being included multiple times in one file. <code>#include</code> is very simplistic: it just copies the contents of one file into another during compilation.</p>
-    <pre class="code">
-      <code>#ifndef __EVEN_H__</code>
-      <code>#define __EVEN_H__</code>
-      <code></code>
-      <code>int is_even(int n);</code>
-      <code></code>
-      <code>#endif /* __EVEN_H__ */</code>
+    <pre class="language-c">
+      <code>#ifndef __EVEN_H__
+#define __EVEN_H__
+
+int is_even(int n);
+
+#endif /* __EVEN_H__ */</code>
     </pre>
     <h4>Sequence of commands to create an executable</h4>
     <p>To compile the two .c files into an executable, I ran this sequence of commands to create the file <code>program</code> which can then be run with: <code>$ ./program</code>. The <code>$</code> at the start of each line means that what follows is shell input, and if you're running this for yourself you wouldn't write the <code>$</code>.</p>
     <pre>
-      <code>$ gcc even.c -c                 # -c compiles a .o object</code>
-      <code>$ gcc main.c -c</code>
-      <code>$ gcc main.o even.o -o program  # -o compiles an executable</code>
+      $ gcc even.c -c                 # -c compiles a .o object
+      $ gcc main.c -c
+      $ gcc main.o even.o -o program  # -o compiles an executable
+    </pre>
+    <h4>Equivalent makefile</h4>
+    <p>
+      This makefile runs the equivalent of the commands above to compile <code>main.c</code> and <code>even.c</code> together into an executable.
+    </p>
+    <pre>
+<code class="language-makefile"># set the compiler
+CC := gcc
+CFLAGS := -Wall
+
+# compile prog from a list of object files
+prog: main.o even.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+# how to transform source files to object files
+%.o: %.c
+	$(CC) $(CFLAGS) $< -c
+
+# clean up the directory. -f here makes rm not print
+# an error if the file doesn't exist
+.PHONY: clean
+clean:
+	rm -f *.o
+	rm -f prog
+      </code>
     </pre>
   </main>
 </body>
