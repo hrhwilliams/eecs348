@@ -33,6 +33,75 @@
     <p>
       <a href="https://github.com/hrhwilliams/EECS348_Lab-7-template">Template for Lab 7</a> with instructions for how to begin. More experience with C programming, and with using continuous integration via GitHub Actions.
     </p>
+    <h2>Pointers and debugging SEGFAULT</h2>
+    <h3>Using an address sanitizer</h3>
+    <p>
+      We can catch many pointer errors in our programs if we use an address sanitizer. This is a library we build into
+      our program to perform some checks every time we access memory, either through a pointer directly, or through an
+      array index, which is really just accessing a pointer at an offset under the hood. For example, we might have a
+      pointer that we don't actually make point to anything. C will put a random value into it, and when we try to access
+      it, that random value will likely not point to anything in our program so the OS will kill it and report a SEGFAULT
+      (Segmentation fault).
+    </p>
+    <p>
+      The OS makes sure any memory accesses our program makes actually are to addresses allocated to the program. If we
+      try to access any memory whatsoever, the OS kills our program to protect the integrity of the system. Otherwise you
+      could have processes accidentally changing the memory of other processes and causing all sorts of errors. So, for example:
+    </p>
+    <pre>
+<code class="language-c">/* create an integer pointer and try to dereference it */
+int *x;
+*x = 500; /* `x` doesn't point to anything in the program so SEGFAULT! */
+</code>
+    </pre>
+    <p>
+      We create an integer pointer and then immediately dereference it and set its contents to <code>500</code>. Because the
+      memory address in the pointer is random, it doesn't point into our process so the OS kills it with a SEGFAULT. We could
+      also directly set the memory address of a pointer like:
+    </p>
+    <pre>
+      <code class="language-c">
+/* a pointer is just a number, so it's valid to cast a number to a pointer right? */
+*(char*) 0 = '\0'; /* SEGFAULT! */
+      </code>
+    </pre>
+    <p>
+      And the same thing will most likely happen. Both of these examples will just cause the program to crash with no useful
+      debugging information. We can give ourselves more to work with if we compile our code with the address sanitizer that
+      comes with <code>gcc</code> and <code>clang</code> (on macOS) like so:
+    </p>
+    <pre>
+      gcc program.c -fsanitize=address -g -o program
+    </pre>
+    <p>
+      Here I use the <code>-fsanitize=address</code> compiler flag to link the address sanitizer, and the <code>-g</code> flag
+      to build debugging information into my executable. When we run the code above, rather than a SEGFAULT message, we get a
+      detailed report about where the buggy pointer dereference occurred.
+    </p>
+    <pre>
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==28220==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x000107520f19 bp 0x7ff7b89e2800 sp 0x7ff7b89e27e0 T0)
+==28220==The signal is caused by a WRITE memory access.
+==28220==Hint: address points to the zero page.
+    #0 0x107520f19 in main example.c:5
+    #1 0x7ff802122417 in start+0x767 (dyld:x86_64+0xfffffffffff6e417) (BuildId: be14380c5e1836409fbe851beb014bba32000000200000000100000000070d00)
+
+==28220==Register values:
+rax = 0x0000000000000000  rbx = 0x0000000107520ee0  rcx = 0x00007ff7b89e2b50  rdx = 0x00007ff7b89e2ac0  
+rdi = 0x0000000000000001  rsi = 0x00007ff7b89e2ab0  rbp = 0x00007ff7b89e2800  rsp = 0x00007ff7b89e27e0  
+ r8 = 0x000000010751d3c0   r9 = 0x0000000000000000  r10 = 0x0000000000004000  r11 = 0x0000000000040000  
+r12 = 0x00007ff7b89e29c8  r13 = 0x00007ff7b89e2a40  r14 = 0x00007ff7b89e2a00  r15 = 0x00007ff7b89e2890  
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV ex.c:5 in main
+==28220==ABORTING
+    </pre>
+    <p>
+      Here the useful part is the line telling us that the dereference occurred in <code>example.c</code> at line 5. It's usually
+      enough to go back to that line and then trace where the pointer came from and what values it possibly could have
+      to be able to diagnose the issue. In this case it's obvious because we're initializing the pointer to zero and then dereferencing
+      it, but in real code it's most likely the pointer was never set to a value and then passed to a function or into a struct.
+    </p>
     <h2>CMake and GitHub Action setup</h2>
     <p>
       The following is documentation for how the tests are set up with CMake and ran with GitHub Actions.
