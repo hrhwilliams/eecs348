@@ -49,7 +49,7 @@ h3, h4, h5, h6 {
 code, pre {
   /* font-family:Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal; */
   color:#333;
-  font-size:14px;
+  /* font-size:14px; */
 }
 
 
@@ -82,6 +82,7 @@ td {
 }
 
 code {
+  font: normal 16px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
   /* background-color:#EEEEEE; */
   /* font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Liberation Mono"; */
 }

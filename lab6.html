@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
 
+  <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link href="style.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
@@ -106,14 +107,22 @@ my_array[1].length = 5;
       our input with the following code:
     </p>
       <pre>
-        <code class="language-c">char buffer[512];
+        <code class="language-c">/* place to store the characters we read */
+char buffer[512]; 
 
 /* "r" here means: open the file in read mode */
 FILE *fp = fopen("input.txt", "r"); 
 
 /* fgets will read up to the first newline or *
  * the end of the file, whichever comes first */
-char *line = fgets(buffer, sizeof buffer, fp);</code>
+char *line = fgets(buffer, sizeof buffer, fp);
+
+if (line == NULL) {
+    /* there was nothing read */
+}
+
+/* we have to manually close the file after we're done */
+fclose(fp);</code>
       </pre>
     <p>
       Here we allocate an array of characters for the text to be read into, named creatively <code>buffer</code>. We make it 512 characters long, which should be
@@ -127,18 +136,35 @@ char *line = fgets(buffer, sizeof buffer, fp);</code>
       returns <code>NULL</code>, which means it has ran into the end of the file.
     </p>
     <pre>
-      <code class="language-c">char buffer[512];
-FILE *fp = fopen(filename, "r");
+      <code class="language-c">/* place to store the characters we read */
+char buffer[512];
+/* we also need to store each line we read so that we can refer back to it later */
+char *lines[64]; 
+/* keep track of how many lines we've actually read, because C won't stop us from
+ * trying to read beyond it */
+int line_count = 0;
+
+/* open the file and get the first line */
+FILE *fp = fopen("input.txt", "r");
 char *line = fgets(buffer, sizeof buffer, fp);
 
-while (line != NULL) { /* check if we're done reading */
-    process_line(line);
-    line = fgets(buffer, sizeof buffer, fp) /* get the next input line */
-}</code>
+for (int i = 0; line != NULL && i &lt; sizeof lines; i++) {
+    /* copy the line we just read into `lines` */
+    lines[i] = strndup(line, sizeof buffer);
+    /* get the next line */
+    line = fgets(buffer, sizeof buffer, fp);
+    line_count++;
+
+    /* your code for processing `line` can go here */
+    /* ... */
+}
+
+/* we can close the file now since all of its lines have been read into `lines` */
+fclose(fp);</code>
     </pre>
     <p>
-      Here we use a while-loop. We check if <code>line</code> is <code>NULL</code>
-      in each iteration, and if not, we pass it along to <code>process_input</code> and grab the next line. This should be enough to read the input, just keep
+      Here we use a for-loop. We check if <code>line</code> is <code>NULL</code> and if we've read more lines than we can store
+      in each iteration, and if not, we can process it and then grab the next line. This should be enough to read the input, just keep
       in mind that each line will have a newline character at the end.
     </p>
     <h3>Parsing strings</h3>
@@ -149,14 +175,26 @@ while (line != NULL) { /* check if we're done reading */
       To do this with <code class="language-c">strtok</code>, we do:
     </p>
     <pre>
-      <code class="language-c">/* Small technicality: strtok can't modify a hard-coded string,
- * so we create one it can modify with strdup. */
-const char *line = "Peer,Can you help me on this?,12-01-2024";
-char *input = strdup(line);
+      <code class="language-c">/* let's use the first line we read previously */
+char *input = lines[0];
+/* `strtok` splits the string by a delimiter.
+ * let's say input = "EMAIL Peer,Can you help me on this?,12-01-2024 */
+char *command = strtok(input, " ");
 
-char *sender = strtok(input, ",");
-char *subject = strtok(NULL, ",");
-char *date = strtok(NULL, ",");</code>
+/* variables to store parts of the string we're interested in */
+char *sender;
+char *subject;
+char *date;
+
+/* `strcmp` tells us how many characters differ in two strings. if 0 differ,
+ * the strings are equal */
+if (strcmp(command, "EMAIL") == 0) {
+    /* now we want to split by ",". our string is already in `strtok`'s memory
+     * so we call `strtok` with NULL */
+    sender = strtok(NULL, ",");
+    subject = strtok(NULL, ",");
+    date = strtok(NULL, ",");
+}</code>
     </pre>
     <p>
       The first call takes the input string and the delimiter, the <code>","</code>, and returns the part of the string up to the first instance of the delimiter
@@ -179,9 +217,14 @@ char *date = strtok(NULL, ",");</code>
     printf("[Error] One of the parsed strings is NULL\n");
 }
 
+/* we need to make sure `strtok` returns NULL once so that we can use it again
+ * on a new string */
 if (strtok(NULL, ",") != NULL) {
     printf("[Error] Expected strtok to return NULL when finished processing input\n");
-}</code>
+}
+
+/* just print sender, subject, date so we can see if we read and parsed correctly */
+printf("%s:%s:%s\n", sender, subject, date);</code>
     </pre>
   </main>
 </body>
