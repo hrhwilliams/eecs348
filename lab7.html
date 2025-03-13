@@ -34,6 +34,74 @@
       <a href="https://github.com/hrhwilliams/EECS348_Lab-7-template">Template for Lab 7</a> with instructions for how to begin. More experience with C programming, and with using continuous integration via GitHub Actions.
     </p>
     <h2>Pointers and debugging SEGFAULT</h2>
+    <p>
+      A value, such as a number or the contents of a struct, can have one variable that it is assigned to, and it can have any number of pointers referring to it.
+    </p>
+    <pre>
+      <code class="language-c">int x = 100; /* create a int variable. this holds a `value` */
+int *xp; /* create a variable that can point to an int. this `points` to a value */
+xp = &x; /* make `xp` point to `x` by getting `x`'s memory address with the & operator */
+*xp = 5; /* dereference `xp` with * and set its contents to 5. this sets x = 5. */
+
+/* Unlike in Python, assigning one struct to another creates a copy, for the
+ * reason given above */
+struct Data d1;
+d1.value = 20;
+struct Data d2 = d1;
+
+/* Modifying d2 does not change d1 */
+d2.value = 50;
+assert(d1.value != 50);
+
+/* A pointer refers to the struct in memory, and can modify it by dereferencing,
+   just like how `xp` modifies `x`. Use the -> operator to modify a struct ptr */
+struct Data *dptr = &d1;
+dptr->value = 50;
+assert(d1.value == 50);</code>
+    </pre>
+    <p>
+      A pointer can be a single object, or it can be an array of objects.
+    </p>
+    <pre>
+      <code class="language-c">/* malloc gives us a memory address that is big enough to hold 3 integers.
+ * the argument to malloc is the bytes of memory to alloc, which we can
+ * calculate as 3 times the size of an int */
+int *x = malloc(3 * sizeof int);
+x[0] = 5;
+x[1] = 6;
+x[2] = 7;
+
+/* whenever we allocate memory we should try to free it: */
+free(x);
+x = NULL; /* the address given to x by malloc is no longer valid so set it to NULL */
+
+/* strings have always been just arrays of `char` */
+char *string = "Hello, world!"
+/* string[0] == 'H' */</code>
+    </pre>
+    <p>
+      A very common use-case for pointers is passing a struct to a function that we may want the function to modify.
+      The default behavior in C when a struct is passed as a parameter is to copy the struct. This means if we change
+      the struct inside a function, the struct outside the function won't have been modified. If we pass a pointer to
+      the struct instead, then the function will modify the struct itself. That's why I pass a pointer to <code>Array</code>
+      in the <code>insert_array</code> function for assignment 4. The <code>Data</code> struct can be passed as a value
+      because it isn't modified by the function.
+    </p>
+    <pre>
+      <code class="language-c">void insert_array(struct Array *array, struct Data data) {
+        if (array == NULL) {
+            /* some error message about the array being uninitialized */
+            return;
+        }
+        if (array->length == 64) {
+            /* handle the case where we've overfilled the array */
+        } else {
+            int index = array->length;
+            array->array[index] = data;
+            array->length += 1;
+        }
+    }</code>
+    </pre>
     <h3>Using an address sanitizer</h3>
     <p>
       We can catch many pointer errors in our programs if we use an address sanitizer. This is a library we build into
@@ -75,8 +143,8 @@ int *x;
     </pre>
     <p>
       Here I use the <code>-fsanitize=address</code> compiler flag to link the address sanitizer, and the <code>-g</code> flag
-      to build debugging information into my executable. When we run the code above, rather than a SEGFAULT message, we get a
-      detailed report about where the buggy pointer dereference occurred.
+      to build debugging information into my executable. When compile and run the code above with the address sanitizer, rather
+      than a SEGFAULT message, we get a detailed report about where the buggy pointer dereference occurred.
     </p>
     <pre>
 AddressSanitizer:DEADLYSIGNAL
