@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="style.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <title>Harlan Williams's Page</title>
+</head>
+<body>
+  <header>
+    <h1>EECS 348 Labs</h1>
+    <ul>
+      <li><a href="index.html">Index</a></li>
+      <li><a href="lab1.html">Lab 1&mdash;Git and GitHub</a></li>
+      <li><a href="lab2.html">Lab 2&mdash;Regular expressions</a></li>
+      <li><a href="lab3.html">Lab 3&mdash;Makefiles</a></li>
+      <li><a href="lab4.html">Lab 4&mdash;Web programming</a></li>
+      <li><a href="lab5.html">Lab 5&mdash;UML use cases</a></li>
+      <li><a href="lab6.html">Lab 6&mdash;UML class diagrams</a></li>
+      <li><a href="lab7.html">Lab 7&mdash;C programming</a></li>
+      <li><a href="asgn4.html">Assignment 4</a></li>
+      <li><a href="lab8.html">Lab 8&mdash;C++ programming</a></li>
+    </ul>
+  </header>
+  <main>
+    <h1>Assignment 4</h1>
+    <h2>Dynamic array</h2>
+    <p>
+        The Python implementation of this assignment had a list that could
+        expand and shrink as needed, so the first data structure I wanted to
+        implement was a dynamic array in order to capture that behavior. In
+        C, we can have pointers to either single objects or to <em>arrays</em> of objects.
+        The only catch is these arrays have a static size, so they cannot
+        grow if we want to put more objects on them than their initial size
+        holds. To get around this, we implement a data structure that starts
+        with an initial number of empty <code>slots</code>, and we add objects
+        into those slots as needed, up until we exceed the number of available
+        slots. When this happens, we re-allocate our <em>array</em> to have more
+        empty slots and then continue as usual.
+    </p>
+    <p>
+        I define the default number of slots in <code>ARR_DEFAULT_SLOTS</code>, and whenever we need to
+        expand the array, I multiply the number of slots by <code>ARR_GROW_BY</code>. I keep
+        track of all of this in an <code>Array</code> struct which holds both the total number of
+        <code>slot</code>s, filled or empty, and the number of objects in the array in <code>length</code>.
+        Because the only data structure this array will be holding is an <code>Email</code>, the array holds
+        a pointer to <code>Email</code>, which is what will point to our dynamically resized array.
+    </p>
+    <pre><code class="language-c">#define ARR_DEFAULT_SLOTS 8
+#define ARR_GROW_BY 2
+
+typedef struct _Array {
+    Email *emails;
+    size_t length;
+    size_t slots;
+} Array;</code></pre>
+    <p>
+      To allocate the array, we use <code>malloc</code> which requires the number of bytes to allocate. To calculate
+      this, I can find the number of bytes one <code>Email</code> takes up with <code>sizeof Email</code>.
+      It's better practice however to use <code>sizeof *array->emails</code>, in case the type of <code>array->emails</code>
+      may ever need to change. The calculation is the same because we find the size of the contents of what <code>array->emails</code>
+      points to. We then multiply by the number of slots in our array, so in sum we calculate: bytes in one Email * Email slots in our array.
+    </p>
+    <p>
+      When we add an <code>Email</code> to our <code>Array</code>, we have to check if there's an empty slot for it or not.
+      If there is not, we grow the number of slots by multiplying by <code>ARR_GROW_BY</code> and then calling <code>realloc</code>,
+      calculating the number of bytes in the new array in exactly the same way as before. Here we pass a pointer to the
+      original array as well, so that <code>realloc</code> can automatically copy over the memory of our original array to the new one
+      and free the old one.
+    </p>
+    <pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#include "email.h"
+#include "array.h"
+
+void new_array(Array *array) {
+    array->length = 0;
+    array->slots = ARR_DEFAULT_SLOTS;
+    array->emails = malloc(array->slots * sizeof *array->emails);
+}
+
+void append_email(Array *array, Email *email) {
+    if (array->slots == array->length) {
+        array->slots *= ARR_GROW_BY;
+        array->emails = realloc(array->emails, array->slots * sizeof *array->emails);
+    }
+
+    array->emails[array->length++] = *email;
+}
+
+int pop_email(Array *array, Email *email) {
+    if (array->length > 0) {
+        array->length--;
+
+        if (email) {
+            *email = array->emails[array->length];
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+void free_array(Array *array) {
+    free(array->emails);
+    array->emails = NULL;
+    array->length = 0;
+    array->slots = 0;
+}</code></pre>
+    <h2>Heap</h2>
+    <p>
+      Now that we have a dynamic array, we can build a heap on top of it. Many of the functions
+      below are exactly the same as in Python now, except for the need to allocate and
+      free the heap manually.
+    </p>
+    <pre><code class="language-c">typedef struct _Heap {
+    Array array;
+} Heap;</code></pre>
+    <p>
+      I create a new structure named <code>Heap</code> that simply wraps an <code>Array</code>. This
+      is because I treat it differently than a normal <code>Array</code> and have a different set of
+      functions I want to call on it.
+    </p>
+    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+
+#include "array.h"
+#include "heap.h"
+
+/* these functions are static because they are called only
+ * within this file, and not made available in the header */
+
+static size_t parent(size_t idx) {
+    return idx == 0 ? 0 : (idx - 1) / 2;
+}
+
+static size_t left_child(size_t idx) {
+    return 2*idx + 1;
+}
+
+static size_t right_child(size_t idx) {
+    return 2*idx + 2;
+}
+
+/* `restrict` tells the compiler that these pointers will never
+ * be pointing to the same object */
+static void swap(Email *restrict e1, Email *restrict e2) {
+    Email tmp = *e1;
+    *e1 = *e2;
+    *e2 = tmp;
+}
+
+static void bubble_down(Heap *heap, size_t idx) {
+    if (idx > heap->array.length) {
+        return;
+    }
+
+    Email *e1 = &heap->array.emails[idx];
+
+    if (left_child(idx) &lt; heap->array.length) {
+        Email *e2 = &heap->array.emails[left_child(idx)];
+        if (cmp_priority(e1, e2) == -1) {
+            swap(e1, e2);
+            bubble_down(heap, left_child(idx));
+        }
+    }
+
+    if (right_child(idx) &lt; heap->array.length) {
+        Email *e3 = &heap->array.emails[right_child(idx)];
+        if (cmp_priority(e1, e3) == -1) {
+            swap(e1, e3);
+            bubble_down(heap, right_child(idx));
+        }
+    }
+}
+
+static void bubble_up(Heap *heap, size_t idx) {
+    if (idx == 0) {
+        return;
+    }
+
+    Email *e1 = &heap->array.emails[idx];
+    Email *e2 = &heap->array.emails[parent(idx)];
+    if (cmp_priority(e1, e2) == 1) {
+        swap(e1, e2);
+        bubble_up(heap, parent(idx));
+    }
+}
+
+void new_heap(Heap *heap) {
+    new_array(&heap->array);
+}
+
+void insert_heap(Heap *heap, Email *email) {
+    append_email(&heap->array, email);
+    bubble_up(heap, heap->array.length - 1);
+}
+
+void pop_heap(Heap *heap, Email *email) {
+    swap(&heap->array.emails[0], &heap->array.emails[heap->array.length - 1]);
+    pop_email(&heap->array, email);
+    bubble_down(heap, 0);
+}
+
+void free_heap(Heap *heap) {
+    free_array(&heap->array);
+}</code></pre>
+    <h2>Email</h2>
+    <pre><code class="language-c">typedef struct _Email {
+    char subject[32];
+    char sender[32];
+    Date date;
+    int priority;
+} Email;</code></pre>
+    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#include "date.h"
+#include "email.h"
+
+Email new_email(char *subject, char *sender, Date date, int priority) {
+    Email e;
+    strncpy(e.subject, subject, sizeof e.subject);
+    strncpy(e.sender, sender, sizeof e.sender);
+    e.date = date;
+    e.priority = priority;
+
+    return e;
+}
+
+/* `restrict` tells the compiler that these pointers will never
+ * be pointing to the same object */
+int cmp_priority(Email *restrict e1, Email *restrict e2) {
+    if (e1->priority &gt; e2->priority) {
+        return 1;
+    } else if (e1->priority &lt; e2->priority) {
+        return -1;
+    } else {
+        return cmp_dates(e1->date, e2->date);
+    }
+}
+
+Email email_from_string(char *string) {
+    Email e;
+    memset(e.sender, 0, sizeof e.sender);
+    memset(e.subject, 0, sizeof e.subject);
+
+    char *sender = strtok(string, ",");
+    strncpy(e.sender, sender, sizeof e.sender);
+    char *subject = strtok(NULL, ",");
+    strncpy(e.subject, subject, sizeof e.subject);
+    char *date = strtok(NULL, ",");
+    e.date = date_from_string(date);
+
+    if (strcmp("Boss", e.sender) == 0) {
+        e.priority = 5;
+    } else if (strcmp("Subordinate", e.sender) == 0) {
+        e.priority = 4;
+    } else if (strcmp("Peer", e.sender) == 0) {
+        e.priority = 3;
+    } else if (strcmp("ImportantPerson", e.sender) == 0) {
+        e.priority = 2;
+    } else {
+        e.priority = 1;
+    }
+
+    return e;
+}</code></pre>
+    <h2>Date</h2>
+    <pre><code class="language-c">typedef struct _Date {
+    int year;
+    int month;
+    int day;
+} Date;</code></pre>
+    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#include "date.h"
+
+int cmp_dates(Date d1, Date d2) {
+    if (d1.year &gt; d2.year) {
+        return 1;
+    } else if (d1.year &lt; d2.year) {
+        return -1;
+    }
+    if (d1.month &gt; d2.month) {
+        return 1;
+    } else if (d1.month &lt; d2.month) {
+        return -1;
+    }
+    if (d1.day &gt; d2.day) {
+        return 1;
+    } else if (d1.day &lt; d2.day) {
+        return -1;
+    }
+    return 0;
+}
+
+Date date_from_string(char *string) {
+    Date d;
+
+    char *month = strtok(string, "-");
+    d.month = atoi(month);
+    char *day = strtok(NULL, "-");
+    d.day = atoi(day);
+    char *year = strtok(NULL, "-");
+    d.year = atoi(year);
+
+    return d;
+}</code></pre>
+  </main>
+</body>
+</html>
