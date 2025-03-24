@@ -30,41 +30,127 @@
   </header>
   <main>
     <h1>Assignment 4</h1>
-    <h2>Dynamic array</h2>
+    <h2>Introduction</h2>
     <p>
-        The Python implementation of this assignment had a list that could
-        expand and shrink as needed, so the first data structure I wanted to
-        implement was a dynamic array in order to capture that behavior. In
-        C, we can have pointers to either single objects or to <em>arrays</em> of objects.
-        The only catch is these arrays have a static size, so they cannot
-        grow if we want to put more objects on them than their initial size
-        holds. To get around this, we implement a data structure that starts
-        with an initial number of empty <code>slots</code>, and we add objects
-        into those slots as needed, up until we exceed the number of available
-        slots. When this happens, we re-allocate our <em>array</em> to have more
-        empty slots and then continue as usual.
+      The goal of this project was to reimplement assignment 1 in C.
+    </p>
+    <h3>Major implementation differences</h3>
+    <p>
+      The biggest difference between this implementation and the Python implementation
+      is the introduction of manual memory management. We have to think more carefully
+      about how we store and access memory in this program, not only for our emails but
+      also for the character strings in the emails and for any data structures we define.
+      The tools C gives us for this are pointers and functions for allocating and freeing
+      memory.
+    </p>
+    <h4>Pointers</h4>
+    <p>
+      All variables have types in C. These can be either a base type (<code>int</code>, <code>char</code>, <code>float</code>, <em>etc.</em>),
+      the type of a user-defined struct, or a pointer to a type, including a pointer to a pointer.
+      The type of a variable defines the kind of data it can store. A variable of type <code>int</code> can only hold an integer value between <code>-2^31</code> and <code>2^31-1</code>, while
+      a variable of type <code>char</code> can only hold an 8-bit value corresponding to an <a href="https://www.ascii-code.com/">ASCII code</a>.
+      We can turn a type into a pointer for that type by prefixing the variable name with an asterisk (<code>*</code>).
+      For example, <code>int *x</code> makes <code>x</code> a pointer to an integer.
     </p>
     <p>
-        I define the default number of slots in <code>ARR_DEFAULT_SLOTS</code>, and whenever we need to
-        expand the array, I multiply the number of slots by <code>ARR_GROW_BY</code>. I keep
-        track of all of this in an <code>Array</code> struct which holds both the total number of
-        <code>slot</code>s, filled or empty, and the number of objects in the array in <code>length</code>.
-        Because the only data structure this array will be holding is an <code>Email</code>, the array holds
-        a pointer to <code>Email</code>, which is what will point to our dynamically resized array.
+      The difference between a variable of base type and a variable of pointer type is whether the variable holds a <em>value</em> or if it holds a <em>memory address</em>.
+      Values are stored at specific memory addresses and modifying a value modifies the contents of that memory address.
+      A pointer allows us to have a single variable that interacts with different memory addresses.
     </p>
-    <pre><code class="language-c">#define ARR_DEFAULT_SLOTS 8
-#define ARR_GROW_BY 2
+    <pre>
+      int x = 5;  // 4 bytes, stored at memory address 0x0000
+      int y = 10; // 4 bytes, stored at memory address 0x0004
+      int z = 15; // 4 bytes, stored at memory address 0x0008
+      
+      int *ptr = &amp;x; // `ptr` gets the memory address of `x`: 0x0000
+      *ptr // this gets the value stored at the memory address 0x0000
+      ptr = &amp;y // set `ptr` to the memory address of `y`: 0x0004
+      *ptr // dereferencing now gives what is in address 0x0004: the value of `y`
+    </pre>
+    <h4>Allocating and freeing memory</h4>
+    <p>
+      We have the tools to make pointers to single objects, but not to arrays of objects such as what we need to hold lists of emails.
+      The <code>malloc</code> function gives us a pointer to a memory area that can hold multiple objects.
+      To use it, we pass in how many bytes long we want our memory area, and it gives us back a pointer to that area.
+      We can then access objects in that memory by array offsets. Its usage goes like:
+    </p>
+    <pre><code class="language-c">/* create a memory area big enough to hold 8 integers */
+int *x = malloc(sizeof(int) * 8);
+x[0] = 1;
+x[1] = 2;
+x[2] = 3;
+/* ... */</code></pre>
+    <p>
+      We calculate the size of the base type multiplied by how many slots of that type we want the array to be able to hold.
+      And when we are done using that memory, we need to use <code>free</code> to de-allocate it.
+      When we call <code>malloc</code>, the operating system sets aside that many bytes of memory for our program.
+      It has no base variable that refers to it, only a pointer, so if we lose the pointer, that memory area still exists but is inaccessible.
+    </p>
+    <pre><code class="language-c">free(x);</code></pre>
+    <p>
+      We can find the size of the base type by using <code>sizeof *x</code> rather than <code>sizeof(int)</code>.
+      Because <code>x</code> is a pointer to an <code>int</code>, dereferencing gives an <code>int</code>, so we can find the size of the type <code>x</code> points to
+      by dereferencing it. This operation doesn't actually use the value at <code>x</code>'s memory address, so it doesn't matter if it is initialized or not.
+    </p>
+    <p>
+      The last memory function used in this code is <code>realloc</code>, which takes a pre-existing memory area allocated with <code>malloc</code> and moves all of its
+      contents into a new memory area of a different size and frees the original memory. This is how we can replicate the behavior of a Python list that grows and shrinks
+      as needed with C arrays which always have a fixed size.
+    </p>
+    <h3>Structure of this document</h3>
+    <p>
+      This document is written in a way that all of the code can be copy-pasted into various files and compiled
+      with some modifications: namely the preprocessor directives (<code>#ifndef</code>, <code>#define</code>, and <code>#endif</code>)
+      and function signatures will need to be added to the header files. There are also minimal
+      comments in the code itself as all of the documentation behind the code and the
+      design choices that were made are on this page. Any comments that do exist are
+      for explaining specific C syntax rather than for explaining intent or behavior.
+    </p>
+    <p>
+      There is also no <code>Makefile</code> provided, but the project structure should be
+      simple enough that the one from <a href="lab3.html">lab 3</a> can be modified to
+      compile it.
+    </p>
+    <h2>Implementation</h2>
+    <h3>Dynamic array</h3>
+    <p>
+      The Python implementation of this assignment had a list that could
+      expand and shrink as needed, so the first data structure implemented
+      here was a dynamic array in order to capture that behavior. In
+      C, we can have pointers to either single objects or to <em>arrays</em> of objects.
+      The only catch is these arrays have a static size, so they cannot
+      grow if we want to put more objects in them than their initial size
+      holds. To get around this, we implement a data structure that starts
+      with an initial number of empty <code>slots</code>, and we add objects
+      into those slots as needed until we exceed the number of available
+      slots. When this happens, we re-allocate our array to have more
+      empty slots and then continue as usual.
+    </p>
+    <p>
+      The default number of slots is defined in <code>ARR_DEFAULT_SLOTS</code>. Whenever we need to
+      expand the array, we multiply the number of array slots by <code>ARR_GROW_BY</code> and use
+      <code>realloc</code> to get a new array of that size. To keep track of the number of slots,
+      number of elements, and the memory address of the array, we create a <code>EmailArray</code> struct which holds both the total number of
+      <code>slot</code>s, filled or empty, and the number of objects in the array in <code>length</code>.
+      Because the only data structure this array will be holding is an <code>Email</code>, the array holds
+      a pointer to <code>Email</code>, which is what will point to our dynamically resized array.
+    </p>
+    <pre><code class="language-c">/* array.h */
 
-typedef struct _Array {
+#define ARR_DEFAULT_SLOTS 8
+#define ARR_GROW_BY 2
+#define ARR_SHRINK_BY 2
+
+typedef struct _EmailArray {
     Email *emails;
     size_t length;
     size_t slots;
-} Array;</code></pre>
+} EmailArray;</code></pre>
     <p>
       To allocate the array, we use <code>malloc</code> which requires the number of bytes to allocate. To calculate
       this, I can find the number of bytes one <code>Email</code> takes up with <code>sizeof Email</code>.
-      It's better practice however to use <code>sizeof *array->emails</code>, in case the type of <code>array->emails</code>
-      may ever need to change. The calculation is the same because we find the size of the contents of what <code>array->emails</code>
+      It's better practice however to use <code>sizeof *array-&gt;emails</code>, in case the type of <code>array-&gt;emails</code>
+      may ever need to change. The calculation is the same because we find the size of the contents of what <code>array-&gt;emails</code>
       points to. We then multiply by the number of slots in our array, so in sum we calculate: bytes in one Email * Email slots in our array.
     </p>
     <p>
@@ -74,63 +160,83 @@ typedef struct _Array {
       original array as well, so that <code>realloc</code> can automatically copy over the memory of our original array to the new one
       and free the old one.
     </p>
-    <pre><code class="language-c">#include &lt;stdio.h&gt;
+    <pre><code class="language-c">/* array.c */
+
+#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 
 #include "email.h"
 #include "array.h"
 
-void new_array(Array *array) {
-    array->length = 0;
-    array->slots = ARR_DEFAULT_SLOTS;
-    array->emails = malloc(array->slots * sizeof *array->emails);
+static void grow_array(EmailArray *array, int factor) {
+    array-&gt;slots *= factor;
+    array-&gt;emails = realloc(array-&gt;emails, array-&gt;slots * sizeof *array-&gt;emails);
 }
 
-void append_email(Array *array, Email *email) {
-    if (array->slots == array->length) {
-        array->slots *= ARR_GROW_BY;
-        array->emails = realloc(array->emails, array->slots * sizeof *array->emails);
+static void shrink_array(EmailArray *array, int factor) {
+    if (array.slots > ARR_DEFAULT_SLOTS) {
+        array-&gt;slots /= factor;
+        array-&gt;emails = realloc(array-&gt;emails, array-&gt;slots * sizeof *array-&gt;emails);
+    }
+}
+
+void new_array(EmailArray *array) {
+    array-&gt;length = 0;
+    array-&gt;slots = ARR_DEFAULT_SLOTS;
+    array-&gt;emails = malloc(array-&gt;slots * sizeof *array-&gt;emails);
+}
+
+void append_email(EmailArray *array, Email *email) {
+    if (array-&gt;slots == array-&gt;length) {
+        grow_array(array, ARR_GROW_BY);
     }
 
-    array->emails[array->length++] = *email;
+    array-&gt;emails[array-&gt;length] = *email;
+    array-&gt;length += 1;
 }
 
-int pop_email(Array *array, Email *email) {
-    if (array->length > 0) {
-        array->length--;
-
-        if (email) {
-            *email = array->emails[array->length];
-        }
-
-        return 1;
+void pop_email(EmailArray *array, Email *email) {
+    if (array-&gt;length == 0) {
+        return;
     }
 
-    return 0;
+    array-&gt;length -= 1;
+
+    if (email) {
+        *email = array-&gt;emails[array-&gt;length];
+    }
+
+    if (4*array-&gt;length &lt;= array-&gt;slots) {
+        shrink_array(array, ARR_SHRINK_BY);
+    }
 }
 
-void free_array(Array *array) {
-    free(array->emails);
-    array->emails = NULL;
-    array->length = 0;
-    array->slots = 0;
+void free_array(EmailArray *array) {
+    free(array-&gt;emails);
+    array-&gt;emails = NULL;
+    array-&gt;length = 0;
+    array-&gt;slots = 0;
 }</code></pre>
-    <h2>Heap</h2>
+    <h3>Heap</h3>
     <p>
       Now that we have a dynamic array, we can build a heap on top of it. Many of the functions
       below are exactly the same as in Python now, except for the need to allocate and
       free the heap manually.
     </p>
-    <pre><code class="language-c">typedef struct _Heap {
-    Array array;
+    <pre><code class="language-c">/* heap.h */
+
+typedef struct _Heap {
+    EmailArray array;
 } Heap;</code></pre>
     <p>
       I create a new structure named <code>Heap</code> that simply wraps an <code>Array</code>. This
       is because I treat it differently than a normal <code>Array</code> and have a different set of
       functions I want to call on it.
     </p>
-    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+    <pre><code class="language-c">/* heap.c */
+
+#include &lt;stdlib.h&gt;
 
 #include "array.h"
 #include "heap.h"
@@ -159,22 +265,22 @@ static void swap(Email *restrict e1, Email *restrict e2) {
 }
 
 static void bubble_down(Heap *heap, size_t idx) {
-    if (idx > heap->array.length) {
+    if (idx &gt; heap-&gt;array.length) {
         return;
     }
 
-    Email *e1 = &heap->array.emails[idx];
+    Email *e1 = &amp;heap-&gt;array.emails[idx];
 
-    if (left_child(idx) &lt; heap->array.length) {
-        Email *e2 = &heap->array.emails[left_child(idx)];
+    if (left_child(idx) &lt; heap-&gt;array.length) {
+        Email *e2 = &amp;heap-&gt;array.emails[left_child(idx)];
         if (cmp_priority(e1, e2) == -1) {
             swap(e1, e2);
             bubble_down(heap, left_child(idx));
         }
     }
 
-    if (right_child(idx) &lt; heap->array.length) {
-        Email *e3 = &heap->array.emails[right_child(idx)];
+    if (right_child(idx) &lt; heap-&gt;array.length) {
+        Email *e3 = &amp;heap-&gt;array.emails[right_child(idx)];
         if (cmp_priority(e1, e3) == -1) {
             swap(e1, e3);
             bubble_down(heap, right_child(idx));
@@ -187,8 +293,8 @@ static void bubble_up(Heap *heap, size_t idx) {
         return;
     }
 
-    Email *e1 = &heap->array.emails[idx];
-    Email *e2 = &heap->array.emails[parent(idx)];
+    Email *e1 = &amp;heap-&gt;array.emails[idx];
+    Email *e2 = &amp;heap-&gt;array.emails[parent(idx)];
     if (cmp_priority(e1, e2) == 1) {
         swap(e1, e2);
         bubble_up(heap, parent(idx));
@@ -196,31 +302,35 @@ static void bubble_up(Heap *heap, size_t idx) {
 }
 
 void new_heap(Heap *heap) {
-    new_array(&heap->array);
+    new_array(&amp;heap-&gt;array);
 }
 
 void insert_heap(Heap *heap, Email *email) {
-    append_email(&heap->array, email);
-    bubble_up(heap, heap->array.length - 1);
+    append_email(&amp;heap-&gt;array, email);
+    bubble_up(heap, heap-&gt;array.length - 1);
 }
 
 void pop_heap(Heap *heap, Email *email) {
-    swap(&heap->array.emails[0], &heap->array.emails[heap->array.length - 1]);
-    pop_email(&heap->array, email);
+    swap(&amp;heap-&gt;array.emails[0], &amp;heap-&gt;array.emails[heap-&gt;array.length - 1]);
+    pop_email(&amp;heap-&gt;array, email);
     bubble_down(heap, 0);
 }
 
 void free_heap(Heap *heap) {
-    free_array(&heap->array);
+    free_array(&amp;heap-&gt;array);
 }</code></pre>
-    <h2>Email</h2>
-    <pre><code class="language-c">typedef struct _Email {
+    <h3>Email</h3>
+    <pre><code class="language-c">/* email.h */
+        
+typedef struct _Email {
     char subject[32];
     char sender[32];
     Date date;
     int priority;
 } Email;</code></pre>
-    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+    <pre><code class="language-c">/* email.c */
+
+#include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 
 #include "date.h"
@@ -239,12 +349,12 @@ Email new_email(char *subject, char *sender, Date date, int priority) {
 /* `restrict` tells the compiler that these pointers will never
  * be pointing to the same object */
 int cmp_priority(Email *restrict e1, Email *restrict e2) {
-    if (e1->priority &gt; e2->priority) {
+    if (e1-&gt;priority &gt; e2-&gt;priority) {
         return 1;
-    } else if (e1->priority &lt; e2->priority) {
+    } else if (e1-&gt;priority &lt; e2-&gt;priority) {
         return -1;
     } else {
-        return cmp_dates(e1->date, e2->date);
+        return cmp_dates(e1-&gt;date, e2-&gt;date);
     }
 }
 
@@ -274,13 +384,17 @@ Email email_from_string(char *string) {
 
     return e;
 }</code></pre>
-    <h2>Date</h2>
-    <pre><code class="language-c">typedef struct _Date {
+    <h3>Date</h3>
+    <pre><code class="language-c">/* date.h */
+        
+typedef struct _Date {
     int year;
     int month;
     int day;
 } Date;</code></pre>
-    <pre><code class="language-c">#include &lt;stdlib.h&gt;
+    <pre><code class="language-c">/* date.c */
+        
+#include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 
 #include "date.h"
