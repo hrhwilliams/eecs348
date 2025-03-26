@@ -45,8 +45,10 @@
 #define __MY_CLASS_HPP__
 
 class MyClass {
+
 // everything that follows `public` is callable or usable outside the class
 public:
+
     // default constructor (initializes class with no parameters)
     MyClass();
     
@@ -63,8 +65,10 @@ public:
     // const means member variables of the class are unmodified
     // by this function call
     void my_const_function() const;
+
 // everything that follows `private` is called or used only within the class:
 private:
+
     // private member functions and member variables go here.
     void my_private_function();
 
@@ -76,7 +80,7 @@ private:
 
 #endif // __MY_CLASS_HPP__</code></pre>
   <p>
-    Then in a separate source code file, you can write the <em>definitions</em> for each member function. C++ puts every function declared in your class in a namespace (just like <code>std::</code>), so you have to prefix each function with the name of your class like so:
+    Then in a separate source code file, you can write the <em>definitions</em> for each member function. C++ puts every function declared in your class in a namespace (just like <code class="language-cpp">std::</code>), so you have to prefix each function with the name of your class like so:
   </p>
   <pre><code class="language-cpp">// myclass.cpp
 #include "myclass.hpp"
