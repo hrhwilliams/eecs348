@@ -85,12 +85,12 @@ private:
 
 #endif // __MY_CLASS_HPP__</code></pre>
     <p>
-      My best practice for organizing class definitions is: constructors, public member functions, private member
-      functions, public member variables (ideally you don't have any), private member variables. There is no enforcement
-      of this by the compiler, but it's ordered by what I care about most to least when reading the code for a class. No
-      matter how you choose to organize things, a lot of coding is just about picking <em>some</em> standard and
-      sticking to it; this keeps readers from getting surprised when they get used to the way you organize things in one
-      file, just to find everything is completely different elsewhere.
+      My best practice for ordering declarations in classes is: constructors at the top, public member functions,
+      private member functions, public member variables (ideally you don't have any), private member variables. There is
+      no enforcement of this by the compiler, but it's ordered by what I care about most to least when reading the code
+      for a class. No matter how you choose to organize things, a lot of coding is just about picking <em>some</em>
+      standard and sticking to it; this keeps readers from getting surprised when they get used to the way you organize
+      things in one file, just to find everything is completely different elsewhere.
     </p>
     <p>
       Then in a separate source code file, you can write the <em>definitions</em> for each member function. C++ puts
