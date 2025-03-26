@@ -10,7 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
   <script>hljs.highlightAll();</script>
-  <title>Harlan Williams's Page</title>
+  <title>EECS 348</title>
 </head>
 <body>
   <header>
@@ -45,6 +45,7 @@
 #define __MY_CLASS_HPP__
 
 class MyClass {
+// everything that follows `public` is callable or usable outside the class
 public:
     // default constructor (initializes class with no parameters)
     MyClass();
@@ -61,7 +62,8 @@ public:
 
     // const means member variables of the class are unmodified
     // by this function call
-    void my_const_function() const; 
+    void my_const_function() const;
+// everything that follows `private` is called or used only within the class:
 private:
     // private member functions and member variables go here.
     void my_private_function();
@@ -100,7 +102,9 @@ void MyClass::my_function() {
 
 void MyClass::my_const_function() const {
     int x = 5;
-    x += 5;  // modify a variable declared in the class
+    x += 5;  // modify a variable declared in the function.
+             // fine because this has no effect on the class's
+             // member variables
 }
 
 void MyClass::my_private_function() {
