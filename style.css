@@ -32,6 +32,8 @@ main h3, main h4 {
 }
 
 main {
+  text-align: justify;
+  text-justify:distribute-all-lines;
   position: relative;
   left: 300px;
   width: 800px;
@@ -49,8 +51,6 @@ p code {
 
 p {
   padding-bottom: 16px;
-  text-align: justify;
-  text-justify: inter-word;
   font: normal 17px/24px "Source Sans Pro", sans-serif;
 }
  a {

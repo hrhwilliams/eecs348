@@ -6,14 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
   <link href="style.css" rel="stylesheet" type="text/css">
-  <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet'
+    type='text/css'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DSN2HH9SBS"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-DSN2HH9SBS');
@@ -102,7 +103,7 @@ private:
     <aside>
       No matter how you choose to organize things, a lot of coding is just about picking <em>some</em>
       standard and sticking to it; this keeps readers from getting surprised when they get used to the way you organize
-      things in one file, just to find everything is completely different elsewhere.
+      things in one file, just to find everything is completely different in another one.
     </aside>
     <p>
       Then in a separate source code file, you can write the <em>definitions</em> for each member function. C++ puts
@@ -123,7 +124,7 @@ MyClass::MyClass(int x) : _x(x) {
 }
 
 MyClass::~MyClass() {
-  // destructor
+
 }
 
 void MyClass::my_function() {
@@ -142,6 +143,22 @@ void MyClass::my_private_function() {
     // do something that outside users of my class shouldn't do
     // directly
 }</code></pre>
+    <p>
+      The usage of the class would then look something like this:
+    </p>
+    <pre><code class="language-cpp">MyClass my_class(); // calls the default constructor
+MyClass my_class2(6); // calls the constructor that takes a parameter
+const MyClass my_class_const(7); // creates an immutable version of my class
+
+// class declared without const can call both functions
+my_class.my_function();
+my_class.my_const_function();
+
+// class declared const can only call const functions
+my_class_const.my_const_function();
+
+// when all three objects go out of scope, their destructors are called
+</code></pre>
   </main>
 </body>
 
