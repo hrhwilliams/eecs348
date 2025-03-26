@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en-US">
+
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link href="style.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 
@@ -12,11 +14,13 @@
   <script>hljs.highlightAll();</script>
   <title>EECS 348</title>
 </head>
+
 <body>
   <header>
     <h1>EECS 348 Labs</h1>
     <ul>
       <li><a href="index.html">Index</a></li>
+      <hr>
       <li><a href="lab1.html">Lab 1&mdash;Git and GitHub</a></li>
       <li><a href="lab2.html">Lab 2&mdash;Regular expressions</a></li>
       <li><a href="lab3.html">Lab 3&mdash;Makefiles</a></li>
@@ -37,7 +41,8 @@
     </h2>
     <p>
       Classes have their <em>declarations</em> in header files, given either a <code>.h</code> file extension or a
-      <code>.hpp</code> file extension to show that it's specifically a C++ header file. You would lay out a class in a header file like,
+      <code>.hpp</code> file extension to show that it's specifically a C++ header file. You would lay out a class in a
+      header file like,
       for example:
     </p>
     <pre><code class="language-cpp">// myclass.hpp
@@ -79,10 +84,20 @@ private:
 };
 
 #endif // __MY_CLASS_HPP__</code></pre>
-  <p>
-    Then in a separate source code file, you can write the <em>definitions</em> for each member function. C++ puts every function declared in your class in a namespace (just like <code class="language-cpp">std::</code>), so you have to prefix each function with the name of your class like so:
-  </p>
-  <pre><code class="language-cpp">// myclass.cpp
+    <p>
+      My best practice for organizing class definitions is: constructors, public member functions, private member
+      functions, public member variables (ideally you don't have any), private member variables. There is no enforcement
+      of this by the compiler, but it's ordered by what I care about most to least when reading the code for a class. No
+      matter how you choose to organize things, a lot of coding is just about picking <em>some</em> standard and
+      sticking to it; this keeps readers from getting surprised when they get used to the way you organize things in one
+      file, just to find everything is completely different elsewhere.
+    </p>
+    <p>
+      Then in a separate source code file, you can write the <em>definitions</em> for each member function. C++ puts
+      every function declared in your class in a namespace (just like <code class="language-cpp">std::</code>), so you
+      have to prefix each function with the name of your class like so:
+    </p>
+    <pre><code class="language-cpp">// myclass.cpp
 #include "myclass.hpp"
 
 // colon after parameter list of a constructor is a list of member
@@ -117,4 +132,5 @@ void MyClass::my_private_function() {
 }</code></pre>
   </main>
 </body>
+
 </html>
