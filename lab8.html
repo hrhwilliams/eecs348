@@ -31,25 +31,83 @@
   <main>
     <h1>Lab 8 &mdash; C++ programming</h1>
     <p>
-      <a href="slides/lab8.pdf">Slides</a>. Programming in C++.
+      <a href="https://github.com/hrhwilliams/EECS348_Lab-8-template">Template for Lab 8</a>. Programming in C++.
     </p>
     <h2>
       Classes in C++
     </h2>
-    <pre><code class="language-cpp">class MyClass {
-public:
-    MyClass()  { // constructor
+    <p>
+      Classes have their <em>declarations</em> in header files, given either a <code>.h</code> file extension or a
+      <code>.hpp</code> file extension to show that it's specifically a C++ header file. You would lay out a class in a header file like,
+      for example:
+    </p>
+    <pre><code class="language-cpp">// myclass.hpp
+#ifndef __MY_CLASS_HPP__
+#define __MY_CLASS_HPP__
 
-    }
-    ~MyClass() { // destructor
-      
-    }
+class MyClass {
+public:
+    // default constructor (initializes class with no parameters)
+    MyClass();
+    
+    // constructor that takes an argument
+    MyClass(int x);
+
+    // destructor (prefixed with a `~`). destructors never take
+    // parameters
+    ~MyClass();
 
     // public member functions go here
+    void my_function();
+
+    // const means member variables of the class are unmodified
+    // by this function call
+    void my_const_function() const; 
 private:
-    // private member functions and member variables
-    // go here
-};</code></pre>
+    // private member functions and member variables go here.
+    void my_private_function();
+
+    // best practice is to prefix variables with something to show
+    // that they come from the class definition when used in
+    // functions
+    int _x;
+};
+
+#endif // __MY_CLASS_HPP__</code></pre>
+  <p>
+    Then in a separate source code file, you can write the <em>definitions</em> for each member function. C++ puts every function declared in your class in a namespace (just like <code>std::</code>), so you have to prefix each function with the name of your class like so:
+  </p>
+  <pre><code class="language-cpp">// myclass.cpp
+#include "myclass.hpp"
+
+// colon after parameter list of a constructor is a list of member
+// variables and what to initialize them to
+MyClass::MyClass() : _x(0) {
+
+}
+
+MyClass::MyClass(int x) : _x(x) {
+
+}
+
+MyClass::~MyClass() {
+  // destructor
+}
+
+void MyClass::my_function() {
+    int x = 5;
+    _x += x; // modify the member variable `_x`
+}
+
+void MyClass::my_const_function() const {
+    int x = 5;
+    x += 5;  // modify a variable declared in the class
+}
+
+void MyClass::my_private_function() {
+    // do something that outside users of my class shouldn't do
+    // directly
+}</code></pre>
   </main>
 </body>
 </html>
