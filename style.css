@@ -43,8 +43,14 @@ body {
   /* font: normal 17px/24px "Source Sans Pro", sans-serif; */
 }
 
+p code {
+  font-size: 16px;
+}
+
 p {
   padding-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
   font: normal 17px/24px "Source Sans Pro", sans-serif;
 }
  a {
