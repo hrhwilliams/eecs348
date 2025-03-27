@@ -1,18 +1,44 @@
 body {
-  padding:50px;
-  color:#444;
-  font-weight:300;
+  padding: 50px;
+  color: #444;
+  font-weight: 300;
   background-color: #fbfbfc;
 }
 
-body, h1, h2, h3, h4, p, blockquote, code, ul, ol, dl, dd, img {
+ul {
+  list-style: none;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+blockquote,
+code,
+ul,
+ol,
+dl,
+dd,
+img {
   margin: 0;
+}
+
+h1, h2, h3 {
+  line-height: 1.2
 }
 
 nav {
   position: fixed;
   margin: 100px 0 0 0;
-  width: 280px;
+  width: 274px;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2
 }
 
 main h1 {
@@ -26,17 +52,18 @@ main h2 {
   padding-bottom: 16px;
 }
 
-main h3, main h4 {
+main h3,
+main h4 {
   padding-top: 14px;
   padding-bottom: 14px;
 }
 
 main {
   text-align: justify;
-  text-justify:distribute-all-lines;
+  text-justify: distribute-all-lines;
   position: relative;
-  left: 300px;
-  width: 800px;
+  left: 290px;
+  width: 724px;
 }
 
 body {
@@ -49,15 +76,21 @@ p code {
   font-size: 16px;
 }
 
+pre code {
+  font-size: 14px;
+}
+
 p {
   padding-bottom: 16px;
   font: normal 17px/24px "Source Sans Pro", sans-serif;
 }
- a {
-  text-decoration: none;
- }
 
- a:link, a:visited {
+a {
+  text-decoration: none;
+}
+
+a:link,
+a:visited {
   color: rgb(85, 109, 175);
 }
 
@@ -67,7 +100,7 @@ a:hover {
 
 a:active {
   color: rgb(52, 52, 197);
-} 
+}
 
 aside {
   font: normal 17px/24px "Source Sans Pro", sans-serif;

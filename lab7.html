@@ -38,6 +38,8 @@
       <li><a href="lab6.html">Lab 6&mdash;UML class diagrams</a></li>
       <li><a href="lab7.html">Lab 7&mdash;C programming</a></li>
       <li><a href="lab8.html">Lab 8&mdash;C++ programming</a></li>
+      <hr>
+      <li><a href="assignment4.html">Assignment 4</a></li>
     </ul>
   </nav>
   <main>
@@ -158,7 +160,7 @@ int *x;
       to build debugging information into my executable. When compile and run the code above with the address sanitizer, rather
       than a SEGFAULT message, we get a detailed report about where the buggy pointer dereference occurred.
     </p>
-    <pre>
+    <pre><code>
 AddressSanitizer:DEADLYSIGNAL
 =================================================================
 ==28220==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x000107520f19 bp 0x7ff7b89e2800 sp 0x7ff7b89e27e0 T0)
@@ -175,7 +177,7 @@ r12 = 0x00007ff7b89e29c8  r13 = 0x00007ff7b89e2a40  r14 = 0x00007ff7b89e2a00  r1
 AddressSanitizer can not provide additional info.
 SUMMARY: AddressSanitizer: SEGV ex.c:5 in main
 ==28220==ABORTING
-    </pre>
+</code></pre>
     <p>
       Here the useful part is the line telling us that the dereference occurred in <code>example.c</code> at line 5. It's usually
       enough to go back to that line and then trace where the pointer came from and what values it possibly could have
