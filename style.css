@@ -1,112 +1,173 @@
-body {
-  padding: 50px;
-  color: #444;
-  font-weight: 300;
-  background-color: #fbfbfc;
+/* Define color and font variables for easy customization */
+:root {
+  --primary-color: #556dab;
+  --hover-color: #8556a0;
+  --active-color: #3434c5;
+  --text-color: #222;
+  --bg-color: #fbfbfc;
+  --nav-bg: #fff;
+  --nav-border: #e0e0e0;
+  --font-main: "Source Sans Pro", sans-serif;
+  --font-code: "Source Code Pro", monospace;
 }
 
+/* Global resets and base styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 50px;
+  font: normal 16px/1.5 var(--font-main);
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  line-height: 1.6;
+}
+
+/* Remove default list styles */
 ul {
   list-style: none;
-}
-
-body,
-h1,
-h2,
-h3,
-h4,
-p,
-blockquote,
-code,
-ul,
-ol,
-dl,
-dd,
-img {
+  padding: 0;
   margin: 0;
 }
 
-h1, h2, h3 {
-  line-height: 1.2
+/* Headings */
+h1, h2, h3, h4 {
+  margin: 0 0 1rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
+/* Typography for paragraphs and code */
+p {
+  margin-bottom: 1rem;
+}
+
+code {
+  font-family: var(--font-code);
+  font-size: 1em;
+}
+
+/* Navigation styling */
 nav {
   position: fixed;
-  margin: 100px 0 0 0;
-  width: 274px;
+  top: 50px;
+  left: 50px;
+  width: 260px;
+  background: var(--nav-bg);
+  padding: 20px;
+  border: 1px solid var(--nav-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-h1,
-h2,
-h3 {
-  line-height: 1.2
+nav h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
+nav ul li {
+  margin: 0.5rem 0;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--hover-color);
+}
+
+a:active {
+  color: var(--active-color);
+}
+
+/* Main content area styling */
+main, #footnotes {
+  margin-left: 340px; /* space for the fixed nav */
+  max-width: 800px;
+  padding: 20px;
+}
+
+aside {
+  padding: 20px;
+}
+
+/* Headings in main */
 main h1 {
-  font: 600 30px/24px sans-serif;
-  padding-top: 25px;
-  padding-bottom: 25px;
+  font-size: 2rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 main h2 {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  font-size: 1.75rem;
+  padding: 0.4rem 0;
 }
 
 main h3,
 main h4 {
-  padding-top: 14px;
-  padding-bottom: 14px;
+  font-size: 1.5rem;
+  padding: 0.35rem 0;
 }
 
-main {
-  text-align: justify;
-  text-justify: distribute-all-lines;
-  position: relative;
-  left: 290px;
-  width: 724px;
-}
-
-body {
-  color: #222;
-  font: normal 16px/24px sans-serif;
-  /* font: normal 17px/24px "Source Sans Pro", sans-serif; */
+pre {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 p code {
-  font-size: 16px;
+  background: #f0f0f0;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
 }
 
-pre code {
-  font-size: 14px;
-}
-
-p {
-  padding-bottom: 16px;
-  font: normal 17px/24px "Source Sans Pro", sans-serif;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:link,
-a:visited {
-  color: rgb(85, 109, 175);
-}
-
-a:hover {
-  color: rgb(133, 86, 160);
-}
-
-a:active {
-  color: rgb(52, 52, 197);
-}
-
-aside {
-  font: normal 17px/24px "Source Sans Pro", sans-serif;
+main aside {
   position: absolute;
-  right: -336px;
-  width: 288px;
-  font: normal 14px/20px sans-serif;
-  border-top: solid 1px #232329;
+  /* right: 50px; */
+  left: 1200px;
+  width: 280px;
+  border-top: 1px solid var(--nav-border);
+  font-size: 0.875rem;
+  padding-top: 1rem;
+  color: var(--text-color);
+}
+
+/*  */
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  nav {
+    position: relative;
+    width: 85%;
+    margin-bottom: 2rem;
+  }
+  main {
+    margin: 0;
+  }
+}
+
+@media (max-width: 1480px) {
+  main aside {
+    position: absolute;
+    bottom: 0;
+  
+    /* And if you want the div to be full-width: */
+    left: 0;
+    right: 0;
+  }
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: #4b4b53;
 }

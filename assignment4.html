@@ -68,6 +68,7 @@ typedef struct _EmailArray {
 } EmailArray;</code></pre>
     <pre><code class="language-c">/* array.c */
 
+#include &lt;limits.h&gt;
 #include &lt;stdlib.h&gt;
 
 #include "common.h"
@@ -75,22 +76,22 @@ typedef struct _EmailArray {
 #include "array.h"
 
 static void grow_array(EmailArray *array) {
-    if (array-&gt;slots == 0 || array->slots &gt; UINT_MAX / ARRAY_GROW_BY) {
+    if (array->slots == 0 || array->slots > UINT_MAX / ARRAY_GROW_BY) {
         panic("unable to grow array");
     }
     
-    array-&gt;slots *= ARRAY_GROW_BY;
-    array-&gt;emails = realloc(array-&gt;emails, array-&gt;slots * sizeof *array-&gt;emails);
+    array->slots *= ARRAY_GROW_BY;
+    array->emails = realloc(array->emails, array->slots * sizeof *array->emails);
 }
 
 static void shrink_array(EmailArray *array) {
-    if (array.slots == 0) {
+    if (array->slots == 0) {
         panic("unable to shrink array");
     }
 
-    if (array.slots > ARRAY_MIN_SLOTS) {
-        array-&gt;slots /= ARRAY_GROW_BY;
-        array-&gt;emails = realloc(array->emails, array->slots * sizeof *array->emails);
+    if (array->slots > ARRAY_MIN_SLOTS) {
+        array->slots /= ARRAY_GROW_BY;
+        array->emails = realloc(array->emails, array->slots * sizeof *array->emails);
     }
 }
 
@@ -119,7 +120,7 @@ Email pop_email(EmailArray *array) {
     array->count -= 1;
     Email email = array->emails[array->count];
 
-    if (2 * ARR_GROW_BY * array->count &lt; array->slots) {
+    if (2 * ARRAY_GROW_BY * array->count &lt; array->slots) {
         shrink_array(array);
     }
 
@@ -141,7 +142,7 @@ size_t count_emails(EmailArray *array) {
 void free_array(EmailArray *array) {
     free(array->emails);
     array->emails = NULL;
-    array->length = 0;
+    array->count = 0;
     array->slots = 0;
 }</code></pre>
     <h2>Heap</h2>
@@ -151,10 +152,10 @@ typedef struct _Heap {
     EmailArray array;
 } Heap;</code></pre>
     <pre><code class="language-c">/* heap.c */
-
 #include &lt;stdlib.h&gt;
 
 #include "common.h"
+#include "email.h"
 #include "array.h"
 #include "heap.h"
 
@@ -172,7 +173,6 @@ static size_t right_child(size_t idx) {
 
 /* `restrict` tells the compiler that these pointers will never
  * be pointing to the same object */
-
 static void swap(Email *restrict e1, Email *restrict e2) {
     Email tmp = *e1;
     *e1 = *e2;
@@ -200,7 +200,7 @@ static void bubble_up(Heap *heap, size_t idx) {
 }
 
 static void bubble_down(Heap *heap, size_t idx) {
-    if (idx > heap->array.elements) {
+    if (heap->array.count == 0 || idx > heap->array.count) {
         return;
     }
 
@@ -229,7 +229,7 @@ void insert_heap(Heap *heap, Email *email) {
     }
 
     append_email(&heap->array, email);
-    bubble_up(heap, heap->array.length - 1);
+    bubble_up(heap, heap->array.count - 1);
 }
 
 Email pop_heap(Heap *heap) {
@@ -238,10 +238,14 @@ Email pop_heap(Heap *heap) {
     }
 
     swap(get_email(&heap->array, 0),
-         get_email(&heap->array, count_emails(&heap->array) - 1));
+            get_email(&heap->array, count_emails(&heap->array) - 1));
     Email email = pop_email(&heap->array);
     bubble_down(heap, 0);
     return email;
+}
+
+int count_heap(Heap *heap) {
+    return heap->array.count;
 }
 
 void free_heap(Heap *heap) {
@@ -330,17 +334,17 @@ typedef struct _Date {
 int cmp_dates(Date d1, Date d2) {
     if (d1.year > d2.year) {
         return 1;
-    } else if (d1.year < d2.year) {
+    } else if (d1.year &lt; d2.year) {
         return -1;
     }
     if (d1.month > d2.month) {
         return 1;
-    } else if (d1.month < d2.month) {
+    } else if (d1.month &lt; d2.month) {
         return -1;
     }
     if (d1.day > d2.day) {
         return 1;
-    } else if (d1.day < d2.day) {
+    } else if (d1.day &lt; d2.day) {
         return -1;
     }
     return 0;
@@ -357,6 +361,61 @@ Date date_from_string(char *string) {
     d.year = atoi(year);
 
     return d;
+}</code></pre>
+  <h2>Main</h2>
+  <pre><code class="language-c">/* main.c */
+
+/* this main just takes in an input file, parses and adds all emails to a heap,
+ * and then prints them in order sorted by priority */ 
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#include "common.h"
+#include "date.h"
+#include "email.h"
+#include "array.h"
+#include "heap.h"
+
+Email process_email_line(char *line) {
+    /* offset in the string where the email csv begins */
+    return email_from_string(line + 6);
+}
+
+int main(int argc, char *argv[]) {
+    char buf[256];
+
+    if (argc != 2) {
+        panic("usage: ./prog file");
+    }
+
+    Heap heap = new_heap();
+    FILE *fp = fopen(argv[1], "r");
+
+    while (1) {
+        char *line = fgets(buf, sizeof buf, fp);
+
+        if (!line || feof(fp)) {
+            break;
+        }
+
+        if (strncmp(line, "EMAIL", 5) == 0) {
+            Email e = process_email_line(line);
+            insert_heap(&heap, &e);
+        }
+    }
+
+    int emails = count_heap(&heap);
+    for (int i = 0; i &lt; emails; i++) {
+        Email e = pop_heap(&heap);
+
+        printf("Sender: %s\nSubject: %s\nDate: %d/%d/%d\n\n",
+                e.sender, e.subject, e.date.month, e.date.day, e.date.year);
+    }
+
+    free_heap(&heap);
+    fclose(fp);
 }</code></pre>
   </main>
 </body>
