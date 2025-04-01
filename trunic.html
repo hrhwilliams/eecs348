@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>Trunic Guesser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+  <link href="style.css" rel="stylesheet" type="text/css">
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <script>
+    const vowels = Object.freeze({
+      a:   ["o0", "o7", "o1", "o2"],
+      ar:  ["o1", "o2", "o5", "o6"],
+      ah:  ["o0", "o7", "o1"],
+      ay:  ["o1"],
+      e:   ["o0", "o5", "o6", "o7"],
+      ee:  ["o0", "o1", "o5", "o6", "o7"],
+      eer: ["o0", "o1", "o5", "o7"],
+      eh:  ["o1", "o2"],
+      ere: ["o0", "o1", "o5", "o7"],
+      i:   ["o5", "o6"],
+      ie:  ["o2"],
+      ir:  ["o0", "o2", "o5", "o6", "o7"],
+      oh:  ["o0", "o1", "o2", "o5", "o6", "o7"],
+      oi:  ["o6"],
+      oo:  ["o0", "o1", "o2", "o6", "o7"],
+      ou:  ["o0", "o6", "o7"],
+      ow:  ["o5"],
+      ore: ["o0", "o1", "o2", "o5", "o7"],
+    });
+  
+    const consonants = Object.freeze({
+      b:  ["i0", "i5"],
+      ch: ["i1", "i3"],
+      d:  ["i0", "i4", "i5"],
+      f:  ["i2", "i3", "i4"],
+      g:  ["i2", "i3", "i5"],
+      h:  ["i0", "i3", "i5"],
+      j:  ["i0", "i4"],
+      k:  ["i0", "i2", "i5"],
+      l:  ["i0", "i3"],
+      m:  ["i4", "i5"],
+      n:  ["i1", "i4", "i5"],
+      ng: ["i0", "i3", "i1", "i2", "i4", "i5"],
+      p:  ["i3", "i2"],
+      r:  ["i0", "i3", "i2"],
+      s:  ["i0", "i3", "i2", "i4"],
+      sh: ["i3", "i1", "i2", "i4", "i5"],
+      t:  ["i3", "i1", "i2"],
+      th: ["i0", "i3", "i1", "i2"],
+      th2: ["i0", "i3", "i4", "i5"],
+      v:  ["i0", "i1", "i5"],
+      y:  ["i0", "i3", "i1"],
+      z:  ["i0", "i3", "i1", "i5"],
+      zh: ["i0", "i1", "i2", "i4", "i5"],
+    });
+  
+    function reset_rune(toggles) {
+      toggles.forEach(element => {
+        ($("#trune").find("#" + element).attr("stroke", "#fbfbfc"));
+        ($("#trune").find("#" + element).attr("z", "0"));
+      });
+  
+      sort_z_level()
+    }
+  
+    function reset_all() {
+      let $lines = $("#trune").children();
+      $lines.each((_, e) => {
+        if (e.id != "center") {
+          e.setAttribute("stroke", "#fbfbfc")
+          e.setAttribute("z", "0")
+        }
+      });
+    }
+  
+    function sort_z_level() {
+      var $lines = $("#trune").children();
+      $lines.sort((a, b) => {
+        var az = parseInt(a.getAttribute("z"), 10);
+        var bz = parseInt(b.getAttribute("z"), 10);
+  
+        if (az > bz) {
+          return 1;
+        } else if (bz > az) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+  
+      $lines.detach().appendTo($("#trune"))
+    }
+  
+    function set_rune(toggles) {
+      if (toggles.includes("i3") && !toggles.includes("i0")) {
+        toggles.push("i3u");
+      }
+  
+      toggles.forEach(element => {
+        ($("#trune").find("#" + element).attr("stroke", "#333"));
+        ($("#trune").find("#" + element).attr("z", "1"));
+      });
+  
+      sort_z_level();
+    }
+  
+    function random_vowel() {
+      let idx = Math.floor(Math.random() * Object.keys(vowels).length);
+      return Object.keys(vowels)[idx];
+    }
+  
+    function random_consonant() {
+      let idx = Math.floor(Math.random() * Object.keys(consonants).length);
+      return Object.keys(consonants)[idx];
+    }
+  
+    function random_trune() {
+      reset_all();
+      set_rune(vowels[random_vowel()]);
+      set_rune(consonants[random_consonant()]);
+    }
+  
+    document.getElementById("vowel-input").addEventListener("input", (event) => {
+      reset_rune(["o0", "o1", "o2", "o3", "o4", "o5", "o6", "o7"]);
+  
+      if (event.target.value in vowels) {
+        set_rune(vowels[event.target.value]);
+      }
+    });
+  
+    document.getElementById("consonant-input").addEventListener("input", (event) => {
+      reset_rune(["i0", "i1", "i2", "i3", "i3u", "i4", "i5"]);
+  
+      if (event.target.value in consonants) {
+        set_rune(consonants[event.target.value]);
+      }
+    });
+  
+    document.getElementById("order-input").addEventListener("input", (event) => {
+      if (event.target.checked) {
+        set_rune(["circle"]);
+      } else {
+        reset_rune(["circle"])
+      }
+    });
+  
+    $("#trune").click(function (event) {
+      if ($(event.target).attr("stroke") == "black") {
+        $(event.target).attr("stroke", "white");
+        $(event.target).attr("z", "0");
+      } else {
+        $(event.target).attr("stroke", "black");
+        $(event.target).attr("z", "1");
+      }
+  
+      sort_z_level()
+    });
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DSN2HH9SBS"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-DSN2HH9SBS');
+  </script>
+</head>
+<body>
+  <nav>
+    <h1>EECS 348 Labs</h1>
+    <ul>
+      <li><a href="index.html">Index</a></li>
+      <hr>
+      <li><a href="lab1.html">Lab 1&mdash;Git and GitHub</a></li>
+      <li><a href="lab2.html">Lab 2&mdash;Regular expressions</a></li>
+      <li><a href="lab3.html">Lab 3&mdash;Makefiles</a></li>
+      <li><a href="lab4.html">Lab 4&mdash;Web programming</a></li>
+      <li><a href="lab5.html">Lab 5&mdash;UML use cases</a></li>
+      <li><a href="lab6.html">Lab 6&mdash;UML class diagrams</a></li>
+      <li><a href="lab7.html">Lab 7&mdash;C programming</a></li>
+      <li><a href="lab8.html">Lab 8&mdash;C++ programming</a></li>
+      <li><a href="lab9.html">Lab 9&mdash; More C++ programming</a></li>
+      <hr>
+      <li><a href="assignment4.html">Assignment 4</a></li>
+      <hr>
+      <li><a href="trunic.html">Tunic rune teacher</a></li>
+    </ul>
+  </nav>
+  <main>
+    <h1>Tunic rune teacher</h1>
+    <p><a href="https://www.omniglot.com/conscripts/trunic.htm">Explanation</a></p>
+    <hr>
+    <svg id="trune" width="140" height="240" viewBox="-1 -2 28 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <!-- top outer -->
+        <line id="o0" x1="0"  y1="8"  x2="0"  y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="o1" x1="0"  y1="8"  x2="13" y2="0"  z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="o2" x1="13" y1="0"  x2="26" y2="8"  z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="o3" x1="26" y1="8"  x2="26" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+    
+        <!-- bottom outer -->
+        <line id="o4" x1="26" y1="26" x2="26" y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="o5" x1="26" y1="34" x2="13" y2="42" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="o6" x1="13" y1="42" x2="0"  y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="o7" x1="0"  y1="34" x2="0"  y2="26" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+    
+        <!-- top inner -->
+        <line id="i0" x1="13" y1="0"  x2="13" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="i1" x1="0"  y1="8"  x2="13" y2="16" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="i2" x1="13" y1="16" x2="26" y2="8"  z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+    
+        <!-- bottom inner -->
+        <line id="i3u" x1="13" y1="16" x2="13" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="i3" x1="13" y1="26" x2="13" y2="42" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="i4" x1="0"  y1="34" x2="13" y2="26" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+        <line id="i5" x1="13" y1="26" x2="26" y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+    
+        <!-- circle -->
+        <circle id="circle" r="2.5" cx="13" cy="45" z="0" fill="none" stroke="#fbfbfc" stroke-width="2" />
+    
+        <!-- center -->
+        <line id="center"  x1="0"  y1="20" x2="26" y2="20" z="1" stroke="#333" stroke-linecap="round" stroke-width="2" />
+    </svg>
+    <br>
+    <button type="button" onclick="random_trune()">Random Rune</button>
+    <button type="button" onclick="reset_all()">Clear</button>
+    <br>
+    <p>Vowel:
+        <button type="button" onclick="">a   &LeftAngleBracket;æ&RightAngleBracket;</button>
+        <button type="button" onclick="">ar  &LeftAngleBracket;ɑ:&RightAngleBracket;</button>
+        <button type="button" onclick="">ah  &LeftAngleBracket;ɒ&RightAngleBracket;</button>
+        <button type="button" onclick="">ay  &LeftAngleBracket;eɪ&RightAngleBracket;</button>
+        <button type="button" onclick="">e   &LeftAngleBracket;ɛ&RightAngleBracket;</button>
+        <button type="button" onclick="">ee  &LeftAngleBracket;i:&RightAngleBracket;</button>
+        <button type="button" onclick="">eer &LeftAngleBracket;ɪɚ&RightAngleBracket;</button>
+        <button type="button" onclick="">uh  &LeftAngleBracket;ɘ&RightAngleBracket;</button>
+        <button type="button" onclick="">eir &LeftAngleBracket;eɚ&RightAngleBracket;</button>
+        <button type="button" onclick="">i   &LeftAngleBracket;ɪ&RightAngleBracket;</button>
+        <button type="button" onclick="">ie  &LeftAngleBracket;aɪ&RightAngleBracket;</button>
+        <button type="button" onclick="">ir  &LeftAngleBracket;ɝ:&RightAngleBracket;</button>
+        <button type="button" onclick="">oh  &LeftAngleBracket;oʊ&RightAngleBracket;</button>
+        <button type="button" onclick="">oi  &LeftAngleBracket;ɔɪ&RightAngleBracket;</button>
+        <button type="button" onclick="">oo  &LeftAngleBracket;u:&RightAngleBracket;</button>
+        <button type="button" onclick="">ou  &LeftAngleBracket;ʊ&RightAngleBracket;</button>
+        <button type="button" onclick="">ow  &LeftAngleBracket;aʊ&RightAngleBracket;</button>
+        <button type="button" onclick="">ore &LeftAngleBracket;ʊɚ&RightAngleBracket;</button>
+    </p>
+    <p>Consonant:
+        <button type="button" onclick="">b &LeftAngleBracket;b&RightAngleBracket;</button>
+        <button type="button" onclick="">ch &LeftAngleBracket;tʃ&RightAngleBracket;</button>
+        <button type="button" onclick="">d &LeftAngleBracket;d&RightAngleBracket;</button>
+        <button type="button" onclick="">f &LeftAngleBracket;f&RightAngleBracket;</button>
+        <button type="button" onclick="">g &LeftAngleBracket;g&RightAngleBracket;</button>
+        <button type="button" onclick="">h &LeftAngleBracket;h&RightAngleBracket;</button>
+        <button type="button" onclick="">j &LeftAngleBracket;dʒ&RightAngleBracket;</button>
+        <button type="button" onclick="">k &LeftAngleBracket;k&RightAngleBracket;</button>
+        <button type="button" onclick="">l &LeftAngleBracket;l&RightAngleBracket;</button>
+        <button type="button" onclick="">m &LeftAngleBracket;m&RightAngleBracket;</button>
+        <button type="button" onclick="">n &LeftAngleBracket;n&RightAngleBracket;</button>
+        <button type="button" onclick="">ng &LeftAngleBracket;ŋ&RightAngleBracket;</button>
+        <button type="button" onclick="">p &LeftAngleBracket;p&RightAngleBracket;</button>
+        <button type="button" onclick="">r &LeftAngleBracket;ɹ&RightAngleBracket;</button>
+        <button type="button" onclick="">s &LeftAngleBracket;s&RightAngleBracket;</button>
+        <button type="button" onclick="">sh &LeftAngleBracket;ʃ&RightAngleBracket;</button>
+        <button type="button" onclick="">t &LeftAngleBracket;t&RightAngleBracket;</button>
+        <button type="button" onclick="">th &LeftAngleBracket;θ&RightAngleBracket;</button>
+        <button type="button" onclick="">th &LeftAngleBracket;ð&RightAngleBracket;</button>
+        <button type="button" onclick="">v &LeftAngleBracket;v&RightAngleBracket;</button>
+        <button type="button" onclick="">w &LeftAngleBracket;w&RightAngleBracket;</button>
+        <button type="button" onclick="">y &LeftAngleBracket;j&RightAngleBracket;</button>
+        <button type="button" onclick="">z &LeftAngleBracket;z&RightAngleBracket;</button>
+        <button type="button" onclick="">zh &LeftAngleBracket;ʒ&RightAngleBracket;</button>
+    </p>
+  </main>
+</body>
+</html>
