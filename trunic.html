@@ -8,6 +8,14 @@
   <link href="style.css" rel="stylesheet" type="text/css">
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <style>
+    button.correct {
+      background-color: green;
+    }
+    button.wrong {
+      background-color: red;
+    }
+  </style>
   <script>
     const vowels = Object.freeze({
       a:   ["o0", "o7", "o1", "o2"],
@@ -55,17 +63,13 @@
       z:  ["i0", "i3", "i1", "i5"],
       zh: ["i0", "i1", "i2", "i4", "i5"],
     });
-  
-    function reset_rune(toggles) {
-      toggles.forEach(element => {
-        ($("#trune").find("#" + element).attr("stroke", "#fbfbfc"));
-        ($("#trune").find("#" + element).attr("z", "0"));
-      });
-  
-      sort_z_level()
-    }
+
+    let current_cons = undefined;
+    let current_vowel = undefined;
   
     function reset_all() {
+      clear_guesses();
+
       let $lines = $("#trune").children();
       $lines.each((_, e) => {
         if (e.id != "center") {
@@ -108,12 +112,14 @@
   
     function random_vowel() {
       let idx = Math.floor(Math.random() * Object.keys(vowels).length);
-      return Object.keys(vowels)[idx];
+      current_vowel = Object.keys(vowels)[idx];
+      return current_vowel;
     }
   
     function random_consonant() {
       let idx = Math.floor(Math.random() * Object.keys(consonants).length);
-      return Object.keys(consonants)[idx];
+      current_cons = Object.keys(consonants)[idx];
+      return current_cons;
     }
   
     function random_trune() {
@@ -121,42 +127,33 @@
       set_rune(vowels[random_vowel()]);
       set_rune(consonants[random_consonant()]);
     }
-  
-    document.getElementById("vowel-input").addEventListener("input", (event) => {
-      reset_rune(["o0", "o1", "o2", "o3", "o4", "o5", "o6", "o7"]);
-  
-      if (event.target.value in vowels) {
-        set_rune(vowels[event.target.value]);
-      }
-    });
-  
-    document.getElementById("consonant-input").addEventListener("input", (event) => {
-      reset_rune(["i0", "i1", "i2", "i3", "i3u", "i4", "i5"]);
-  
-      if (event.target.value in consonants) {
-        set_rune(consonants[event.target.value]);
-      }
-    });
-  
-    document.getElementById("order-input").addEventListener("input", (event) => {
-      if (event.target.checked) {
-        set_rune(["circle"]);
+
+    function guess_consonant(g) {
+      if (current_cons === g) {
+        document.getElementById(g).className = "correct";
       } else {
-        reset_rune(["circle"])
+        document.getElementById(g).className = "wrong";
       }
-    });
-  
-    $("#trune").click(function (event) {
-      if ($(event.target).attr("stroke") == "black") {
-        $(event.target).attr("stroke", "white");
-        $(event.target).attr("z", "0");
+    }
+
+    function guess_vowel(g) {
+      if (current_vowel === g) {
+        document.getElementById(g).className = "correct";
       } else {
-        $(event.target).attr("stroke", "black");
-        $(event.target).attr("z", "1");
+        document.getElementById(g).className = "wrong";
       }
-  
-      sort_z_level()
-    });
+    }
+
+    function clear_guesses() {
+      let $vowels = $("#vowel-guesses").children();
+      $vowels.each((_, e) => {
+        e.setAttribute("class", "");
+      });
+      let $consonants = $("#consonant-guesses").children();
+      $consonants.each((_, e) => {
+        e.setAttribute("class", "");
+      });
+    }
   </script>
 
   <!-- Google tag (gtag.js) -->
@@ -228,52 +225,53 @@
     <button type="button" onclick="random_trune()">Random Rune</button>
     <button type="button" onclick="reset_all()">Clear</button>
     <br>
-    <p>Vowel:
-        <button type="button" onclick="">a   &LeftAngleBracket;æ&RightAngleBracket;</button>
-        <button type="button" onclick="">ar  &LeftAngleBracket;ɑ:&RightAngleBracket;</button>
-        <button type="button" onclick="">ah  &LeftAngleBracket;ɒ&RightAngleBracket;</button>
-        <button type="button" onclick="">ay  &LeftAngleBracket;eɪ&RightAngleBracket;</button>
-        <button type="button" onclick="">e   &LeftAngleBracket;ɛ&RightAngleBracket;</button>
-        <button type="button" onclick="">ee  &LeftAngleBracket;i:&RightAngleBracket;</button>
-        <button type="button" onclick="">eer &LeftAngleBracket;ɪɚ&RightAngleBracket;</button>
-        <button type="button" onclick="">uh  &LeftAngleBracket;ɘ&RightAngleBracket;</button>
-        <button type="button" onclick="">eir &LeftAngleBracket;eɚ&RightAngleBracket;</button>
-        <button type="button" onclick="">i   &LeftAngleBracket;ɪ&RightAngleBracket;</button>
-        <button type="button" onclick="">ie  &LeftAngleBracket;aɪ&RightAngleBracket;</button>
-        <button type="button" onclick="">ir  &LeftAngleBracket;ɝ:&RightAngleBracket;</button>
-        <button type="button" onclick="">oh  &LeftAngleBracket;oʊ&RightAngleBracket;</button>
-        <button type="button" onclick="">oi  &LeftAngleBracket;ɔɪ&RightAngleBracket;</button>
-        <button type="button" onclick="">oo  &LeftAngleBracket;u:&RightAngleBracket;</button>
-        <button type="button" onclick="">ou  &LeftAngleBracket;ʊ&RightAngleBracket;</button>
-        <button type="button" onclick="">ow  &LeftAngleBracket;aʊ&RightAngleBracket;</button>
-        <button type="button" onclick="">ore &LeftAngleBracket;ʊɚ&RightAngleBracket;</button>
+    <br>
+    <div id="vowel-guesses">Vowel:
+        <button type="button" id="a" onclick="guess_vowel('a')">a   &LeftAngleBracket;æ&RightAngleBracket;</button>
+        <button type="button" id="ar" onclick="guess_vowel('ar')">ar  &LeftAngleBracket;ɑ:&RightAngleBracket;</button>
+        <button type="button" id="ah" onclick="guess_vowel('ah')">ah  &LeftAngleBracket;ɒ&RightAngleBracket;</button>
+        <button type="button" id="ay" onclick="guess_vowel('ay')">ay  &LeftAngleBracket;eɪ&RightAngleBracket;</button>
+        <button type="button" id="e" onclick="guess_vowel('e')">e   &LeftAngleBracket;ɛ&RightAngleBracket;</button>
+        <button type="button" id="ee" onclick="guess_vowel('ee')">ee  &LeftAngleBracket;i:&RightAngleBracket;</button>
+        <button type="button" id="eer" onclick="guess_vowel('eer')">eer &LeftAngleBracket;ɪɚ&RightAngleBracket;</button>
+        <button type="button" id="uh" onclick="guess_vowel('uh')">uh  &LeftAngleBracket;ɘ&RightAngleBracket;</button>
+        <button type="button" id="eir" onclick="guess_vowel('eir')">eir &LeftAngleBracket;eɚ&RightAngleBracket;</button>
+        <button type="button" id="i" onclick="guess_vowel('i')">i  &LeftAngleBracket;ɪ&RightAngleBracket;</button>
+        <button type="button" id="ie" onclick="guess_vowel('ie')">ie  &LeftAngleBracket;aɪ&RightAngleBracket;</button>
+        <button type="button" id="ir" onclick="guess_vowel('ir')">ir  &LeftAngleBracket;ɝ:&RightAngleBracket;</button>
+        <button type="button" id="oh" onclick="guess_vowel('oh')">oh  &LeftAngleBracket;oʊ&RightAngleBracket;</button>
+        <button type="button" id="oi" onclick="guess_vowel('oi')">oi  &LeftAngleBracket;ɔɪ&RightAngleBracket;</button>
+        <button type="button" id="oo" onclick="guess_vowel('oo')">oo  &LeftAngleBracket;u:&RightAngleBracket;</button>
+        <button type="button" id="ou" onclick="guess_vowel('ou')">ou  &LeftAngleBracket;ʊ&RightAngleBracket;</button>
+        <button type="button" id="ow" onclick="guess_vowel('ow')">ow  &LeftAngleBracket;aʊ&RightAngleBracket;</button>
+        <button type="button" id="ore" onclick="guess_vowel('ore')">ore &LeftAngleBracket;ʊɚ&RightAngleBracket;</button>
     </p>
-    <p>Consonant:
-        <button type="button" onclick="">b &LeftAngleBracket;b&RightAngleBracket;</button>
-        <button type="button" onclick="">ch &LeftAngleBracket;tʃ&RightAngleBracket;</button>
-        <button type="button" onclick="">d &LeftAngleBracket;d&RightAngleBracket;</button>
-        <button type="button" onclick="">f &LeftAngleBracket;f&RightAngleBracket;</button>
-        <button type="button" onclick="">g &LeftAngleBracket;g&RightAngleBracket;</button>
-        <button type="button" onclick="">h &LeftAngleBracket;h&RightAngleBracket;</button>
-        <button type="button" onclick="">j &LeftAngleBracket;dʒ&RightAngleBracket;</button>
-        <button type="button" onclick="">k &LeftAngleBracket;k&RightAngleBracket;</button>
-        <button type="button" onclick="">l &LeftAngleBracket;l&RightAngleBracket;</button>
-        <button type="button" onclick="">m &LeftAngleBracket;m&RightAngleBracket;</button>
-        <button type="button" onclick="">n &LeftAngleBracket;n&RightAngleBracket;</button>
-        <button type="button" onclick="">ng &LeftAngleBracket;ŋ&RightAngleBracket;</button>
-        <button type="button" onclick="">p &LeftAngleBracket;p&RightAngleBracket;</button>
-        <button type="button" onclick="">r &LeftAngleBracket;ɹ&RightAngleBracket;</button>
-        <button type="button" onclick="">s &LeftAngleBracket;s&RightAngleBracket;</button>
-        <button type="button" onclick="">sh &LeftAngleBracket;ʃ&RightAngleBracket;</button>
-        <button type="button" onclick="">t &LeftAngleBracket;t&RightAngleBracket;</button>
-        <button type="button" onclick="">th &LeftAngleBracket;θ&RightAngleBracket;</button>
-        <button type="button" onclick="">th &LeftAngleBracket;ð&RightAngleBracket;</button>
-        <button type="button" onclick="">v &LeftAngleBracket;v&RightAngleBracket;</button>
-        <button type="button" onclick="">w &LeftAngleBracket;w&RightAngleBracket;</button>
-        <button type="button" onclick="">y &LeftAngleBracket;j&RightAngleBracket;</button>
-        <button type="button" onclick="">z &LeftAngleBracket;z&RightAngleBracket;</button>
-        <button type="button" onclick="">zh &LeftAngleBracket;ʒ&RightAngleBracket;</button>
-    </p>
+    <div id="consonant-guesses">Consonant:
+        <button type="button" id="b" onclick="guess_consonant('b')">b &LeftAngleBracket;b&RightAngleBracket;</button>
+        <button type="button" id="ch" onclick="guess_consonant('ch')">ch &LeftAngleBracket;tʃ&RightAngleBracket;</button>
+        <button type="button" id="d" onclick="guess_consonant('d')">d &LeftAngleBracket;d&RightAngleBracket;</button>
+        <button type="button" id="f" onclick="guess_consonant('f')">f &LeftAngleBracket;f&RightAngleBracket;</button>
+        <button type="button" id="g" onclick="guess_consonant('g')">g &LeftAngleBracket;g&RightAngleBracket;</button>
+        <button type="button" id="h" onclick="guess_consonant('h')">h &LeftAngleBracket;h&RightAngleBracket;</button>
+        <button type="button" id="j" onclick="guess_consonant('j')">j &LeftAngleBracket;dʒ&RightAngleBracket;</button>
+        <button type="button" id="k" onclick="guess_consonant('k')">k &LeftAngleBracket;k&RightAngleBracket;</button>
+        <button type="button" id="l" onclick="guess_consonant('l')">l &LeftAngleBracket;l&RightAngleBracket;</button>
+        <button type="button" id="m" onclick="guess_consonant('m')">m &LeftAngleBracket;m&RightAngleBracket;</button>
+        <button type="button" id="n" onclick="guess_consonant('n')">n &LeftAngleBracket;n&RightAngleBracket;</button>
+        <button type="button" id="ng" onclick="guess_consonant('ng')">ng &LeftAngleBracket;ŋ&RightAngleBracket;</button>
+        <button type="button" id="p" onclick="guess_consonant('p')">p &LeftAngleBracket;p&RightAngleBracket;</button>
+        <button type="button" id="r" onclick="guess_consonant('r')">r &LeftAngleBracket;ɹ&RightAngleBracket;</button>
+        <button type="button" id="s" onclick="guess_consonant('s')">s &LeftAngleBracket;s&RightAngleBracket;</button>
+        <button type="button" id="sh" onclick="guess_consonant('sh')">sh &LeftAngleBracket;ʃ&RightAngleBracket;</button>
+        <button type="button" id="t" onclick="guess_consonant('t')">t &LeftAngleBracket;t&RightAngleBracket;</button>
+        <button type="button" id="th" onclick="guess_consonant('th')">th &LeftAngleBracket;θ&RightAngleBracket;</button>
+        <button type="button" id="th2" onclick="guess_consonant('th2')">th &LeftAngleBracket;ð&RightAngleBracket;</button>
+        <button type="button" id="v" onclick="guess_consonant('v')">v &LeftAngleBracket;v&RightAngleBracket;</button>
+        <button type="button" id="w" onclick="guess_consonant('w')">w &LeftAngleBracket;w&RightAngleBracket;</button>
+        <button type="button" id="y" onclick="guess_consonant('y')">y &LeftAngleBracket;j&RightAngleBracket;</button>
+        <button type="button" id="z" onclick="guess_consonant('z')">z &LeftAngleBracket;z&RightAngleBracket;</button>
+        <button type="button" id="zh" onclick="guess_consonant('zh')">zh &LeftAngleBracket;ʒ&RightAngleBracket;</button>
+    </div>
   </main>
 </body>
 </html>
