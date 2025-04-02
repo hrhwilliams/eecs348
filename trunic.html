@@ -1,171 +1,37 @@
 <!DOCTYPE html>
 <html lang="en-US">
+
 <head>
   <title>Trunic Guesser</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
-  <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet'
+    type='text/css'>
   <link href="style.css" rel="stylesheet" type="text/css">
-  
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
   <style>
     button.correct {
       background-color: green;
     }
+
     button.wrong {
       background-color: red;
     }
   </style>
-  <script>
-    const vowels = Object.freeze({
-      a:   ["o0", "o7", "o1", "o2"],
-      ar:  ["o1", "o2", "o5", "o6"],
-      ah:  ["o0", "o7", "o1"],
-      ay:  ["o1"],
-      e:   ["o0", "o5", "o6", "o7"],
-      ee:  ["o0", "o1", "o5", "o6", "o7"],
-      eer: ["o0", "o1", "o5", "o7"],
-      eh:  ["o1", "o2"],
-      ere: ["o0", "o1", "o5", "o7"],
-      i:   ["o5", "o6"],
-      ie:  ["o2"],
-      ir:  ["o0", "o2", "o5", "o6", "o7"],
-      oh:  ["o0", "o1", "o2", "o5", "o6", "o7"],
-      oi:  ["o6"],
-      oo:  ["o0", "o1", "o2", "o6", "o7"],
-      ou:  ["o0", "o6", "o7"],
-      ow:  ["o5"],
-      ore: ["o0", "o1", "o2", "o5", "o7"],
-    });
-  
-    const consonants = Object.freeze({
-      b:  ["i0", "i5"],
-      ch: ["i1", "i3"],
-      d:  ["i0", "i4", "i5"],
-      f:  ["i2", "i3", "i4"],
-      g:  ["i2", "i3", "i5"],
-      h:  ["i0", "i3", "i5"],
-      j:  ["i0", "i4"],
-      k:  ["i0", "i2", "i5"],
-      l:  ["i0", "i3"],
-      m:  ["i4", "i5"],
-      n:  ["i1", "i4", "i5"],
-      ng: ["i0", "i3", "i1", "i2", "i4", "i5"],
-      p:  ["i3", "i2"],
-      r:  ["i0", "i3", "i2"],
-      s:  ["i0", "i3", "i2", "i4"],
-      sh: ["i3", "i1", "i2", "i4", "i5"],
-      t:  ["i3", "i1", "i2"],
-      th: ["i0", "i3", "i1", "i2"],
-      th2: ["i0", "i3", "i4", "i5"],
-      v:  ["i0", "i1", "i5"],
-      y:  ["i0", "i3", "i1"],
-      z:  ["i0", "i3", "i1", "i5"],
-      zh: ["i0", "i1", "i2", "i4", "i5"],
-    });
-
-    let current_cons = undefined;
-    let current_vowel = undefined;
-  
-    function reset_all() {
-      clear_guesses();
-
-      let $lines = $("#trune").children();
-      $lines.each((_, e) => {
-        if (e.id != "center") {
-          e.setAttribute("stroke", "#fbfbfc")
-          e.setAttribute("z", "0")
-        }
-      });
-    }
-  
-    function sort_z_level() {
-      var $lines = $("#trune").children();
-      $lines.sort((a, b) => {
-        var az = parseInt(a.getAttribute("z"), 10);
-        var bz = parseInt(b.getAttribute("z"), 10);
-  
-        if (az > bz) {
-          return 1;
-        } else if (bz > az) {
-          return -1;
-        } else {
-          return 0;
-        }
-      });
-  
-      $lines.detach().appendTo($("#trune"))
-    }
-  
-    function set_rune(toggles) {
-      if (toggles.includes("i3") && !toggles.includes("i0")) {
-        toggles.push("i3u");
-      }
-  
-      toggles.forEach(element => {
-        ($("#trune").find("#" + element).attr("stroke", "#333"));
-        ($("#trune").find("#" + element).attr("z", "1"));
-      });
-  
-      sort_z_level();
-    }
-  
-    function random_vowel() {
-      let idx = Math.floor(Math.random() * Object.keys(vowels).length);
-      current_vowel = Object.keys(vowels)[idx];
-      return current_vowel;
-    }
-  
-    function random_consonant() {
-      let idx = Math.floor(Math.random() * Object.keys(consonants).length);
-      current_cons = Object.keys(consonants)[idx];
-      return current_cons;
-    }
-  
-    function random_trune() {
-      reset_all();
-      set_rune(vowels[random_vowel()]);
-      set_rune(consonants[random_consonant()]);
-    }
-
-    function guess_consonant(g) {
-      if (current_cons === g) {
-        document.getElementById(g).className = "correct";
-      } else {
-        document.getElementById(g).className = "wrong";
-      }
-    }
-
-    function guess_vowel(g) {
-      if (current_vowel === g) {
-        document.getElementById(g).className = "correct";
-      } else {
-        document.getElementById(g).className = "wrong";
-      }
-    }
-
-    function clear_guesses() {
-      let $vowels = $("#vowel-guesses").children();
-      $vowels.each((_, e) => {
-        e.setAttribute("class", "");
-      });
-      let $consonants = $("#consonant-guesses").children();
-      $consonants.each((_, e) => {
-        e.setAttribute("class", "");
-      });
-    }
-  </script>
+  <script src="trunic.js"></script>
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DSN2HH9SBS"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-DSN2HH9SBS');
   </script>
 </head>
+
 <body>
   <nav>
     <h1>EECS 348 Labs</h1>
@@ -186,70 +52,74 @@
       <hr>
       <li><a href="trunic.html">Tunic rune teacher</a></li>
     </ul>
-    <img src="fox.png" width="100%"/>
+    <img src="fox.png" width="100%" />
   </nav>
   <main>
     <h1>Tunic rune teacher</h1>
-    <p><a href="https://www.omniglot.com/conscripts/trunic.htm">Explanation</a>. Trunic is the writing system used in Tunic. To help myself learn it better, I wrote this page instead of studying for a midterm. Click <code>Random Rune</code> to see a Tunic rune, and then you can guess the vowel and consonant phonemes in the rune below. If you're right, click <code>Random Rune</code> again and keep going. In the future I want to add a right/wrong tally, or make it automatically go to the next rune once you're right.</p>
+    <p><a href="https://www.omniglot.com/conscripts/trunic.htm">Explanation</a>. Trunic is the writing system used in
+      Tunic. To help myself learn it better, I wrote this page instead of studying for a midterm. Click
+      <code>Random Rune</code> to see a Tunic rune, and then you can guess the vowel and consonant phonemes in the rune
+      below. If you're right, click <code>Random Rune</code> again and keep going. In the future I want to add a
+      right/wrong tally, or make it automatically go to the next rune once you've guessed correctly.</p>
     <hr>
-    <svg id="trune" width="140" height="240" viewBox="-1 -2 28 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-        <!-- top outer -->
-        <line id="o0" x1="0"  y1="8"  x2="0"  y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="o1" x1="0"  y1="8"  x2="13" y2="0"  z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="o2" x1="13" y1="0"  x2="26" y2="8"  z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="o3" x1="26" y1="8"  x2="26" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-    
-        <!-- bottom outer -->
-        <line id="o4" x1="26" y1="26" x2="26" y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="o5" x1="26" y1="34" x2="13" y2="42" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="o6" x1="13" y1="42" x2="0"  y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="o7" x1="0"  y1="34" x2="0"  y2="26" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-    
-        <!-- top inner -->
-        <line id="i0" x1="13" y1="0"  x2="13" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="i1" x1="0"  y1="8"  x2="13" y2="16" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="i2" x1="13" y1="16" x2="26" y2="8"  z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-    
-        <!-- bottom inner -->
-        <line id="i3u" x1="13" y1="16" x2="13" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="i3" x1="13" y1="26" x2="13" y2="42" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="i4" x1="0"  y1="34" x2="13" y2="26" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-        <line id="i5" x1="13" y1="26" x2="26" y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
-    
-        <!-- circle -->
-        <circle id="circle" r="2.5" cx="13" cy="45" z="0" fill="none" stroke="#fbfbfc" stroke-width="2" />
-    
-        <!-- center -->
-        <line id="center"  x1="0"  y1="20" x2="26" y2="20" z="1" stroke="#333" stroke-linecap="round" stroke-width="2" />
+    <svg id="trune" width="140" height="240" viewBox="-1 -2 28 51" version="1.1" xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink">
+      <!-- top outer -->
+      <line id="o0" x1="0" y1="8" x2="0" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="o1" x1="0" y1="8" x2="13" y2="0" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="o2" x1="13" y1="0" x2="26" y2="8" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="o3" x1="26" y1="8" x2="26" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+
+      <!-- bottom outer -->
+      <line id="o4" x1="26" y1="26" x2="26" y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="o5" x1="26" y1="34" x2="13" y2="42" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="o6" x1="13" y1="42" x2="0" y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="o7" x1="0" y1="34" x2="0" y2="26" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+
+      <!-- top inner -->
+      <line id="i0" x1="13" y1="0" x2="13" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="i1" x1="0" y1="8" x2="13" y2="16" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="i2" x1="13" y1="16" x2="26" y2="8" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+
+      <!-- bottom inner -->
+      <line id="i3u" x1="13" y1="16" x2="13" y2="20" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="i3" x1="13" y1="26" x2="13" y2="42" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="i4" x1="0" y1="34" x2="13" y2="26" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+      <line id="i5" x1="13" y1="26" x2="26" y2="34" z="0" stroke="#fbfbfc" stroke-linecap="round" stroke-width="2" />
+
+      <!-- circle -->
+      <circle id="circle" r="2.5" cx="13" cy="45" z="0" fill="none" stroke="#fbfbfc" stroke-width="2" />
+
+      <!-- center -->
+      <line id="center" x1="0" y1="20" x2="26" y2="20" z="1" stroke="#333" stroke-linecap="round" stroke-width="2" />
     </svg>
     <br>
-    <button type="button" onclick="random_trune()">Random Rune</button>
-    <button type="button" onclick="reset_all()">Clear</button>
-    <br>
+    <p><button type="button" onclick="random_trune()">Next Rune</button> Correct vowels: (<span id="vowel-correct">0</span>/<span id="vowel-total">0</span>) Correct consonants: (<span id="consonant-correct">0</span>/<span id="consonant-total">0</span>)</p>
     <br>
     <div id="vowel-guesses">Vowel:
-        <button type="button" id="a" onclick="guess_vowel('a')">a   &LeftAngleBracket;æ&RightAngleBracket;</button>
-        <button type="button" id="ar" onclick="guess_vowel('ar')">ar  &LeftAngleBracket;ɑ:&RightAngleBracket;</button>
-        <button type="button" id="ah" onclick="guess_vowel('ah')">ah  &LeftAngleBracket;ɒ&RightAngleBracket;</button>
-        <button type="button" id="ay" onclick="guess_vowel('ay')">ay  &LeftAngleBracket;eɪ&RightAngleBracket;</button>
-        <button type="button" id="e" onclick="guess_vowel('e')">e   &LeftAngleBracket;ɛ&RightAngleBracket;</button>
-        <button type="button" id="ee" onclick="guess_vowel('ee')">ee  &LeftAngleBracket;i:&RightAngleBracket;</button>
-        <button type="button" id="eer" onclick="guess_vowel('eer')">eer &LeftAngleBracket;ɪɚ&RightAngleBracket;</button>
-        <button type="button" id="uh" onclick="guess_vowel('uh')">uh  &LeftAngleBracket;ɘ&RightAngleBracket;</button>
-        <button type="button" id="eir" onclick="guess_vowel('eir')">eir &LeftAngleBracket;eɚ&RightAngleBracket;</button>
-        <button type="button" id="i" onclick="guess_vowel('i')">i  &LeftAngleBracket;ɪ&RightAngleBracket;</button>
-        <button type="button" id="ie" onclick="guess_vowel('ie')">ie  &LeftAngleBracket;aɪ&RightAngleBracket;</button>
-        <button type="button" id="ir" onclick="guess_vowel('ir')">ir  &LeftAngleBracket;ɝ:&RightAngleBracket;</button>
-        <button type="button" id="oh" onclick="guess_vowel('oh')">oh  &LeftAngleBracket;oʊ&RightAngleBracket;</button>
-        <button type="button" id="oi" onclick="guess_vowel('oi')">oi  &LeftAngleBracket;ɔɪ&RightAngleBracket;</button>
-        <button type="button" id="oo" onclick="guess_vowel('oo')">oo  &LeftAngleBracket;u:&RightAngleBracket;</button>
-        <button type="button" id="ou" onclick="guess_vowel('ou')">ou  &LeftAngleBracket;ʊ&RightAngleBracket;</button>
-        <button type="button" id="ow" onclick="guess_vowel('ow')">ow  &LeftAngleBracket;aʊ&RightAngleBracket;</button>
-        <button type="button" id="ore" onclick="guess_vowel('ore')">ore &LeftAngleBracket;ʊɚ&RightAngleBracket;</button>
-    </p>
-    <div id="consonant-guesses">Consonant:
+      <button type="button" id="a" onclick="guess_vowel('a')">a &LeftAngleBracket;æ&RightAngleBracket;</button>
+      <button type="button" id="ar" onclick="guess_vowel('ar')">ar &LeftAngleBracket;ɑ:&RightAngleBracket;</button>
+      <button type="button" id="ah" onclick="guess_vowel('ah')">ah &LeftAngleBracket;ɒ&RightAngleBracket;</button>
+      <button type="button" id="ay" onclick="guess_vowel('ay')">ay &LeftAngleBracket;eɪ&RightAngleBracket;</button>
+      <button type="button" id="e" onclick="guess_vowel('e')">e &LeftAngleBracket;ɛ&RightAngleBracket;</button>
+      <button type="button" id="ee" onclick="guess_vowel('ee')">ee &LeftAngleBracket;i:&RightAngleBracket;</button>
+      <button type="button" id="eer" onclick="guess_vowel('eer')">eer &LeftAngleBracket;ɪɚ&RightAngleBracket;</button>
+      <button type="button" id="uh" onclick="guess_vowel('uh')">uh &LeftAngleBracket;ɘ&RightAngleBracket;</button>
+      <button type="button" id="eir" onclick="guess_vowel('eir')">eir &LeftAngleBracket;eɚ&RightAngleBracket;</button>
+      <button type="button" id="i" onclick="guess_vowel('i')">i &LeftAngleBracket;ɪ&RightAngleBracket;</button>
+      <button type="button" id="ie" onclick="guess_vowel('ie')">ie &LeftAngleBracket;aɪ&RightAngleBracket;</button>
+      <button type="button" id="ir" onclick="guess_vowel('ir')">ir &LeftAngleBracket;ɝ:&RightAngleBracket;</button>
+      <button type="button" id="oh" onclick="guess_vowel('oh')">oh &LeftAngleBracket;oʊ&RightAngleBracket;</button>
+      <button type="button" id="oi" onclick="guess_vowel('oi')">oi &LeftAngleBracket;ɔɪ&RightAngleBracket;</button>
+      <button type="button" id="oo" onclick="guess_vowel('oo')">oo &LeftAngleBracket;u:&RightAngleBracket;</button>
+      <button type="button" id="ou" onclick="guess_vowel('ou')">ou &LeftAngleBracket;ʊ&RightAngleBracket;</button>
+      <button type="button" id="ow" onclick="guess_vowel('ow')">ow &LeftAngleBracket;aʊ&RightAngleBracket;</button>
+      <button type="button" id="ore" onclick="guess_vowel('ore')">ore &LeftAngleBracket;ʊɚ&RightAngleBracket;</button>
+      </p>
+      <div id="consonant-guesses">Consonant:
         <button type="button" id="b" onclick="guess_consonant('b')">b &LeftAngleBracket;b&RightAngleBracket;</button>
-        <button type="button" id="ch" onclick="guess_consonant('ch')">ch &LeftAngleBracket;tʃ&RightAngleBracket;</button>
+        <button type="button" id="ch" onclick="guess_consonant('ch')">ch
+          &LeftAngleBracket;tʃ&RightAngleBracket;</button>
         <button type="button" id="d" onclick="guess_consonant('d')">d &LeftAngleBracket;d&RightAngleBracket;</button>
         <button type="button" id="f" onclick="guess_consonant('f')">f &LeftAngleBracket;f&RightAngleBracket;</button>
         <button type="button" id="g" onclick="guess_consonant('g')">g &LeftAngleBracket;g&RightAngleBracket;</button>
@@ -266,13 +136,15 @@
         <button type="button" id="sh" onclick="guess_consonant('sh')">sh &LeftAngleBracket;ʃ&RightAngleBracket;</button>
         <button type="button" id="t" onclick="guess_consonant('t')">t &LeftAngleBracket;t&RightAngleBracket;</button>
         <button type="button" id="th" onclick="guess_consonant('th')">th &LeftAngleBracket;θ&RightAngleBracket;</button>
-        <button type="button" id="th2" onclick="guess_consonant('th2')">th &LeftAngleBracket;ð&RightAngleBracket;</button>
+        <button type="button" id="th2" onclick="guess_consonant('th2')">th
+          &LeftAngleBracket;ð&RightAngleBracket;</button>
         <button type="button" id="v" onclick="guess_consonant('v')">v &LeftAngleBracket;v&RightAngleBracket;</button>
         <button type="button" id="w" onclick="guess_consonant('w')">w &LeftAngleBracket;w&RightAngleBracket;</button>
         <button type="button" id="y" onclick="guess_consonant('y')">y &LeftAngleBracket;j&RightAngleBracket;</button>
         <button type="button" id="z" onclick="guess_consonant('z')">z &LeftAngleBracket;z&RightAngleBracket;</button>
         <button type="button" id="zh" onclick="guess_consonant('zh')">zh &LeftAngleBracket;ʒ&RightAngleBracket;</button>
-    </div>
+      </div>
   </main>
 </body>
+
 </html>
