@@ -7,7 +7,7 @@ const vowels = Object.freeze({
     ee: ["o0", "o1", "o5", "o6", "o7"],
     eer: ["o0", "o1", "o5", "o7"],
     uh: ["o1", "o2"],
-    ere: ["o0", "o1", "o5", "o7"],
+    eir: ["o0", "o1", "o5", "o7"],
     i: ["o5", "o6"],
     ie: ["o2"],
     ir: ["o0", "o2", "o5", "o6", "o7"],
@@ -18,6 +18,26 @@ const vowels = Object.freeze({
     ow: ["o5"],
     ore: ["o0", "o1", "o2", "o5", "o7"],
 });
+const vowel_stats = {
+    a: 0,
+    ar: 0,
+    ah: 0,
+    ay: 0,
+    e: 0,
+    ee: 0,
+    eer: 0,
+    uh: 0,
+    eir: 0,
+    i: 0,
+    ie: 0,
+    ir: 0,
+    oh: 0,
+    oi: 0,
+    oo: 0,
+    ou: 0,
+    ow: 0,
+    ore: 0,
+};
 const consonants = Object.freeze({
     b: ["i0", "i5"],
     ch: ["i1", "i3"],
@@ -43,10 +63,38 @@ const consonants = Object.freeze({
     z: ["i0", "i3", "i1", "i5"],
     zh: ["i0", "i1", "i2", "i4", "i5"],
 });
+const consonant_stats = {
+    b: 0,
+    ch: 0,
+    d: 0,
+    f: 0,
+    g: 0,
+    h: 0,
+    j: 0,
+    k: 0,
+    l: 0,
+    m: 0,
+    n: 0,
+    ng: 0,
+    p: 0,
+    r: 0,
+    s: 0,
+    sh: 0,
+    t: 0,
+    th: 0,
+    th2: 0,
+    v: 0,
+    y: 0,
+    z: 0,
+    zh: 0,
+};
+let total_seen = 0;
 let current_cons = undefined;
 let has_guessed_cons = false;
+let cons_correct = 0;
 let current_vowel = undefined;
 let has_guessed_vowel = false;
+let vowel_correct = 0;
 function reset_all() {
     clear_guesses();
     let $lines = $("#trune").children();
@@ -102,14 +150,17 @@ function random_trune() {
     reset_all();
     set_rune(vowels[random_vowel()]);
     set_rune(consonants[random_consonant()]);
-    $("#vowel-total").text(parseInt($("#vowel-total").text()) + 1);
-    $("#consonant-total").text(parseInt($("#consonant-total").text()) + 1);
+    total_seen += 1;
+    $("#vowel-total").text(total_seen);
+    $("#consonant-total").text(total_seen);
 }
 function guess_consonant(g) {
     if (current_cons === g) {
         document.getElementById(g).className = "correct";
         if (!has_guessed_cons) {
-            $("#consonant-correct").text(parseInt($("#consonant-correct").text()) + 1);
+            cons_correct += 1;
+            consonant_stats[g] += 1;
+            $("#consonant-correct").text(cons_correct);
         }
     }
     else {
@@ -121,7 +172,9 @@ function guess_vowel(g) {
     if (current_vowel === g) {
         document.getElementById(g).className = "correct";
         if (!has_guessed_vowel) {
-            $("#vowel-correct").text(parseInt($("#vowel-correct").text()) + 1);
+            vowel_correct += 1;
+            vowel_stats[g] += 1;
+            $("#vowel-correct").text(vowel_correct);
         }
     }
     else {
