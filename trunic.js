@@ -18,7 +18,7 @@ const vowels = Object.freeze({
     ow: ["o5"],
     ore: ["o0", "o1", "o2", "o5", "o7"],
 });
-const vowel_stats = {
+let vowel_stats = {
     a: 0,
     ar: 0,
     ah: 0,
@@ -63,7 +63,7 @@ const consonants = Object.freeze({
     z: ["i0", "i3", "i1", "i5"],
     zh: ["i0", "i1", "i2", "i4", "i5"],
 });
-const consonant_stats = {
+let consonant_stats = {
     b: 0,
     ch: 0,
     d: 0,
