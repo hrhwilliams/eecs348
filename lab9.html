@@ -22,6 +22,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
   <script>hljs.highlightAll();</script>
 </head>
 
@@ -51,7 +52,54 @@
     <p>
       <a href="https://github.com/hrhwilliams/EECS348_Lab-9-template">Template for Lab 9</a>. More programming in C++.
     </p>
+    <h2>Generic programming</h2>
+    <p>First, a brief aside to Python. What things can you pass into this function without getting an error?</p>
+    <pre><code class="language-python">def square(n):
+    return n * n
+</code></pre>
+    <p>What about this one?</p>
+    <pre><code class="language-cpp">def add_twice(n):
+    return x * x;
+</code></pre>
+    <p>To <code>square</code>, you can pass any integer or any floating point number. To <code>add_twice</code> you can pass integers and floats, but also strings as addition between strings is defined as well. This is called <em>duck typing</em>&mdash;if the thing passed to <code>square</code> looks and quacks like a thing that can be multiplied, Python allows it, and if the thing passed to <code>add_twice</code> looks and quacks like a thing that can be added, Python allows that too.</p>
+    <p>This concept is related to <em>generic programming</em>, the ability to write code that works for multiple different data types instead of needing to duplicate functions for every data type.</p>
+    <h3>Templates</h3>
+    <p>In languages that have types such as C, C++, and Java, the type of an object passed to a function must match that function's type signature, the types of its arguments. For example, one way to implement <code>square</code> in C++ would be to write functions for each type we want to square:</p>
+    <pre><code class="language-cpp">float square_floats(float x) {
+    return x * x;
+}
+
+int square_ints(int x) {
+    return x * x;
+}
+
+Matrix square_matrices(const Matrix &x) {
+    return x * x;
+}</code></pre>
+    <p>In all three of the above functions, the code is exactly the same. To get around this, C++ introduces <em>templates</em>, which take a type parameter and allow you to pass any type in that would fit. In this case, any type that has multiplication defined can be passed to this version of square:</p>
+    <pre><code class="language-cpp">template &lt;typename T&gt;
+T square(const T &x) {
+    return x * x;
+}</code></pre>
+    <p>Here, we use the <em>type parameter</em> <code>T</code> to stand in for a type we want to pass, such as <code>int</code>, <code>float</code>, or <code>Matrix</code>. At compile time, this function is used as a template to expand it into different functions for each type that is passed in, hence the name.</p>
+    <p>The above was an example of a templated function. You can also use templates for classes. In fact, if you've used <code>std::vector</code>, you've already used a templated class: you pass in the type that you want the vector to store in angle brackets, and you get a vector capable of storing that type back out. To create a class accepting a template, you write the the template signature above the class like so:</p>
+    <pre><code class="language-cpp">template &lt;typename T&gt;
+class MyList {
+public:
+    MyList();
+    ~MyList();
+
+    size_t length() const;
+
+    // functions that use the type parameter:
+    T get(size_t index) const;
+    void set(size_t index, const T &value);
+private:
+    // member variables that use the type parameter:
+    T *_list;      /* pointer to an array of type `T` */
+    size_t _slots; /* occupied slots in the list */
+    size_t _count; /* total length of the list */
+};</code></pre>
   </main>
 </body>
-
 </html>
