@@ -54,6 +54,83 @@
     <p>
     <a href="slides/lab11.pdf">Slides</a>. How to use Docker to containerize applications.
     </p>
+    <h2>Example with containerizing a Flask web app</h2>
+    <p>
+      <a href="https://flask.palletsprojects.com/en/stable/">Flask</a> is a web application framework for Python. It allows you to write very simple web
+      applications with few lines of code. Here I include an example of a basic Flask web app
+      and the steps to create a Docker image with it.
+    </p>
+    <h3>Writing and running the web app</h3>
+    <p>
+      Starting in a new directory, in the source code file <code>hello.py</code> we write:
+    </p>
+    <pre><code class="language-python">from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+  return "&lt;html&gt;&lt;body&gt;Hello, world!&lt;/body&gt;&lt;/html&gt;"</code></pre>
+    <p>
+      To actually run this, we will need to install Flask, which we can do by creating a Python
+      virtual environment, switching to it, and installing Flask using <code>pip</code>:
+    </p>
+    <pre>python3 -m venv .env
+source .env/bin/activate
+python3 -m pip install flask</pre>
+    <p>
+      This will add Flask to our virtual environment without adding it globally. From there, we
+      need to tell Flask what to run by setting an environment variable:
+    </p>
+    <pre>export FLASK_APP=hello</pre>
+    <p>
+      Finally we should be able to get our web app to run by typing:
+    </p>
+    <pre>flask run --host 127.0.0.1 --port 8080</pre>
+    <p>Which should show</p>
+    <pre> * Serving Flask app 'hello'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8080
+Press CTRL+C to quit</pre>
+    <p>
+      And if you navigate to that URL, you should see a page with the text "Hello, world!".
+    </p>
+    <h3>Containerizing our web app</h3>
+    <p>
+      Even creating a simple web application can involve a nontrivial amount of dependency management
+      (installing Flask) and configuration management (setting the environment variable <code>FLASK_APP</code>).
+      For a larger application, you can imagine how many more steps there could be to set it up.
+      Docker allows us to specify all of the steps we just did manually, together with a desired
+      operating system all together as an <em>image</em>. From images, Docker creates <em>containers</em>,
+      lightweight virtual machines running only our code and an operating system. This simplifies
+      deployment to servers greatly because we can create an image for our application and then
+      spawn containers on a server somewhere as we need, and all dependencies and configuration
+      steps will be automatically done for us.
+    </p>
+    <p>To create a Docker image from our web app, we create a file named <code>Dockerfile</code> and in it specify a base image, copy files into it, install any dependencies/set configuration variables, and lastly give a command to run our application.
+    <pre>FROM python:3.13-alpine3.21
+
+RUN python3 -m pip install flask
+
+WORKDIR /app
+COPY hello.py .
+
+ENV FLASK_APP=hello
+EXPOSE 80
+
+CMD ["flask", "run", "--host", "0.0.0.0", "--port", "80"]</pre>
+    <p>The first line specifies the <em>base</em> image to use for our container. This is a a
+    distribution of Linux with Python 3.13 already set up for us. Next we install Flask with <code>pip</code> like before, but without needing to create a virtual environment first.
+    After that, we create a folder called <code>app</code> in the root directory of our image. Docker will automatically move to that directory after creating it. Then we copy the source for our application, <code>hello.py</code> into the current directory in the image. <code>COPY</code> takes as arguments files on our machine, and then the last argument is a location in the image to copy to. The period <code>.</code> is shorthand for "current directory". The next lines set the environment variable we set before, and expose port 80 which is the port through which HTTP traffic flows.
+    </p>
+    <p>
+    The last line with <code>CMD</code> will execute our Flask application when the image is instantiated in a container. Commands given after <code>RUN</code> are ran when we are creating the image. In this case, we want this command to be run only when we start our container, so we use the <code>CMD</code> keyword instead.
+    </p>
+    <p>Now we can use this script to build our image. Run:</p>
+    <pre>docker build -t hello-world-flask.</pre>
+    <p>This will have Docker build an image named <code>hello-world-flask</code> using the files in our current directory. After Docker builds the image, we are able to see it in Docker Desktop under the Images tab. Next, to actually create a container and run our app, type:</p>
+    <pre>docker run -p 80:80 hello-world-flask</pre>
+    <p>This will create a container from our image named <code>hello-world-flask</code> which is actually running our code. You should see the same output as you did from running <code>flask</code> locally, and if you navigate to the URL you should see the same "Hello, world!" text.</p>
   </main>
 </body>
 </html>
