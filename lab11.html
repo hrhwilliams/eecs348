@@ -85,12 +85,12 @@ python3 -m pip install flask</pre>
     <p>
       Finally we should be able to get our web app to run by typing:
     </p>
-    <pre>flask run --host 127.0.0.1 --port 8080</pre>
+    <pre>flask run --host 127.0.0.1 --port 8000</pre>
     <p>Which should show</p>
     <pre> * Serving Flask app 'hello'
  * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:8080
+ * Running on http://127.0.0.1:8000
 Press CTRL+C to quit</pre>
     <p>
       And if you navigate to that URL, you should see a page with the text "Hello, world!".
@@ -129,8 +129,8 @@ CMD ["flask", "run", "--host", "0.0.0.0", "--port", "80"]</pre>
     <p>Now we can use this script to build our image. Run:</p>
     <pre>docker build -t hello-world-flask.</pre>
     <p>This will have Docker build an image named <code>hello-world-flask</code> using the files in our current directory. After Docker builds the image, we are able to see it in Docker Desktop under the Images tab. Next, to actually create a container and run our app, type:</p>
-    <pre>docker run -p 80:80 hello-world-flask</pre>
-    <p>This will create a container from our image named <code>hello-world-flask</code> which is actually running our code. You should see the same output as you did from running <code>flask</code> locally, and if you navigate to the URL you should see the same "Hello, world!" text.</p>
+    <pre>docker run -p 8000:80 hello-world-flask</pre>
+    <p>This will create a container from our image named <code>hello-world-flask</code> which is actually running our code. You should see the same output as you did from running <code>flask</code> locally, and if you navigate to the URL you should see the same "Hello, world!" text. The <code>8000:80</code> maps the external port 8000 to the internal port 80 in the container. This way we aren't exposing port 80 on our own machine to the outside world while testing the container.</p>
   </main>
 </body>
 </html>
